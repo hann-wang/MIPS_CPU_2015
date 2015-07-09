@@ -111,8 +111,9 @@ module single_cycle_core(clk,
 	
 	//====== Controller ======
 	Controller controller0(
-		.OpCode(InstOpCode),
+		.OpCode(InstOpCode)
 		.Funct(InstFunct),
+		.BeginInterrupt(BeginInterrupt),
 		.PCSrc(PCSrc),
 		.RegWrite(RegWrite),
 		.RegDst(RegDst), 
@@ -123,7 +124,7 @@ module single_cycle_core(clk,
 		.ALUSrc2(ALUSrc2),
 		.ExtOp(ExtOp),
 		.LuOp(LuOp),
-		.ALUOp(ALUOp)
+		.ALUOp(ALUOp),
 		.IsJrJal(IsJrJal));
 
 	//===== Reg File Access =====
@@ -153,6 +154,9 @@ module single_cycle_core(clk,
 	assign JumpTarget = {PC_plus_4[31:28], InstJumpAddr, 2'b00};
 	
 	//====== Branch Target ======
+	//***************************
+	//This needs further improvement!
+	//***************************
 	assign BranchTarget = (ALUZero)? PC_plus_4 + {LU_out[29:0], 2'b00}: PC_plus_4;
 	
 	//====== Memory Access Signal ======
@@ -160,4 +164,5 @@ module single_cycle_core(clk,
 	assign oMemWrite = MemWrite;
 	assign oMemRead = MemRead;
 	assign oMemWriteData = RegReadData2;
+	
 endmodule
