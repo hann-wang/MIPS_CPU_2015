@@ -45,24 +45,24 @@ module single_cycle_core(clk,
 	wire	[31:0]	ALUIn2;
 	wire	[31:0]  ALUOut;
 	wire			ALUSign;
-	wire	[5:0]	AluFunc;
-	wire			AluZero;
-	wire			AluOverflow;
-	wire			AluNegative;
+	wire	[5:0]	ALUFunc;
+	wire			ALUZero;
+	wire			ALUOverflow;
+	wire			ALUNegative;
 
 	//===== Controller =====
 	wire	[1:0]	RegDst;
-	wire	[2:0]	PCSrc;
-	wire			Branch;
+	wire	[1:0]	PCSrc;
 	wire			MemRead;
 	wire			MemWrite;
 	wire	[1:0]	MemToReg;
-	wire	[3:0]	ALUOp;
+	wire	[1:0]	ALUOp;
 	wire			ExtOp;
 	wire			LuOp;
 	wire			ALUSrc1;
 	wire			ALUSrc2;
 	wire			RegWrite;
+	
 	
 	//===== Others =====
 	wire	[31:0]	PC_plus_4;
@@ -74,7 +74,6 @@ module single_cycle_core(clk,
 	wire	[31:0]	PC_next;
 	wire			BeginInterrupt;
 	wire			IsJrJal;
-	
 	//========================
 	//========================
 	//========================
@@ -88,12 +87,12 @@ module single_cycle_core(clk,
 		else
 			PC <= PC_next;
 	end
-	assign PC_next_raw = (PCSrc == 3'b000)? PC_plus_4:
-						(PCSrc == 3'b001) ? BranchTarget:
-						(PCSrc == 3'b010) ? JumpTarget:
-						(PCSrc == 3'b011) ? RegReadData1:
-						(PCSrc == 3'b100) ? 32'b80000004:
-						32'b80000008;
+	assign PC_next_raw =(ALUOverflow) ? 32'h80000008:
+						(BeginInterrupt) ? 32'h80000004:
+						(PCSrc == 2'b00) ? PC_plus_4:
+						(PCSrc == 2'b01) ? BranchTarget:
+						(PCSrc == 2'b10) ? JumpTarget:
+						RegReadData1;
 	assign PC_next = (BeginInterrupt|IsJrJal) ? PC_next_raw :
                     {PC[31],PC_next_raw[30:0]};
 
@@ -108,12 +107,13 @@ module single_cycle_core(clk,
     assign InstJumpAddr = Instruction[25:0];
 	
 	assign BeginInterrupt = (~PC[31])&iInterrupt;
+	assign IsJrJal = InstOpCode==6'h00 && (InstFunct==`FUNCT_JR || InstFunct==`FUNCT_JALR);
 	
 	//====== Controller ======
 	Controller controller0(
 		.OpCode(InstOpCode)
 		.Funct(InstFunct),
-		.BeginInterrupt(BeginInterrupt),
+		.IRQ(BeginInterrupt),
 		.PCSrc(PCSrc),
 		.RegWrite(RegWrite),
 		.RegDst(RegDst), 
@@ -124,8 +124,7 @@ module single_cycle_core(clk,
 		.ALUSrc2(ALUSrc2),
 		.ExtOp(ExtOp),
 		.LuOp(LuOp),
-		.ALUOp(ALUOp),
-		.IsJrJal(IsJrJal));
+		.ALUOp(ALUOp));
 
 	//===== Reg File Access =====
 	assign RegWriteAddr = (RegDst == 2'b00)? InstRt: (RegDst == 2'b01)? InstRd: (RegDst == 2'b10)? 5'b11111 : 5'd26;
@@ -145,10 +144,10 @@ module single_cycle_core(clk,
 	assign LU_out = LuOp? {InstImmediate[15:0], 16'h0000}: Ext_out;
 	
 	//====== ALU ======
-	ALUController alucontroller0(.ALUOp(ALUOp), .Funct(InstFunct), .ALUFunc(ALUFunc), .Sign(ALUSign));
+	ALUController alucontroller0(.ALUOp(ALUOp), .OpCode(InstOpCode), .Funct(InstFunct), .ALUFunc(ALUFunc), .Sign(ALUSign));
 	assign ALUIn1 = ALUSrc1? {17'h00000, InstShamt}: RegReadData1;
 	assign ALUIn2 = ALUSrc2? LU_out: RegReadData2;
-	ALU alu0(.iA(ALUIn1), .iB(ALUIn2), .iALUFun(ALUFunc), .iSign(ALUSign), .oS(ALUOut), .oZ(ALUZero), .oV(AluOverflow), .oN(AluNegative));
+	ALU alu0(.iA(ALUIn1), .iB(ALUIn2), .iALUFun(ALUFunc), .iSign(ALUSign), .oS(ALUOut), .oZ(ALUZero), .oV(ALUOverflow), .oN(ALUNegative));
 	
 	//====== Direct Jump Target ======
 	assign JumpTarget = {PC_plus_4[31:28], InstJumpAddr, 2'b00};
@@ -160,7 +159,7 @@ module single_cycle_core(clk,
 	assign BranchTarget = (ALUZero)? PC_plus_4 + {LU_out[29:0], 2'b00}: PC_plus_4;
 	
 	//====== Memory Access Signal ======
-	assign oMemAddr = AluOut;
+	assign oMemAddr = ALUOut;
 	assign oMemWrite = MemWrite;
 	assign oMemRead = MemRead;
 	assign oMemWriteData = RegReadData2;

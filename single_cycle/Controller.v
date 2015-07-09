@@ -5,7 +5,7 @@
 
 module Controller ( .OpCode,
 					.Funct,
-					.BeginInterrupt,
+					.IRQ,
 					.PCSrc,
 					.RegWrite,
 					.RegDst, 
@@ -16,12 +16,11 @@ module Controller ( .OpCode,
 					.ALUSrc2,
 					.ExtOp,
 					.LuOp,
-					.ALUOp,
-					.IsJrJal);
+					.ALUOp);
 	input  [5:0] OpCode;
 	input  [5:0] Funct;
-	input BeginInterrupt;
-	output [2:0] PCSrc;
+	input 	IRQ;
+	output [1:0] PCSrc;
 	output RegWrite;
 	output [1:0] RegDst;
 	output MemRead;
@@ -31,7 +30,6 @@ module Controller ( .OpCode,
 	output ALUSrc2;
 	output ExtOp;
 	output LuOp;
-	output [3:0] ALUOp;
-	output IsJrJal;
+	output [1:0] ALUOp;
 	
 endmodule
