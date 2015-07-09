@@ -24,7 +24,7 @@ module single_cycle_core(clk,
 
 	//===== Instruction =====
 	reg		[31:0]	PC;
-	input	[31:0]	Instruction;
+	wire	[31:0]	Instruction;
 	wire	[5:0]	InstOpCode;
 	wire	[4:0]	InstRs;
 	wire	[4:0]	InstRt;
@@ -63,7 +63,6 @@ module single_cycle_core(clk,
 	wire			ALUSrc2;
 	wire			RegWrite;
 	
-	
 	//===== Others =====
 	wire	[31:0]	PC_plus_4;
 	wire	[31:0]	Ext_out;
@@ -80,9 +79,9 @@ module single_cycle_core(clk,
 	
 	//===== Instruction Fetch & Split =====
 	assign PC_plus_4 = PC + 32'd4;
-	always @(posedge reset or posedge clk)
+	always @(negedge reset or posedge clk)
 	begin
-		if (reset)
+		if (~reset)
 			PC <= 32'h80000000;
 		else
 			PC <= PC_next;
@@ -107,11 +106,10 @@ module single_cycle_core(clk,
     assign InstJumpAddr = Instruction[25:0];
 	
 	assign BeginInterrupt = (~PC[31])&iInterrupt;
-	assign IsJrJal = InstOpCode==6'h00 && (InstFunct==`FUNCT_JR || InstFunct==`FUNCT_JALR);
 	
 	//====== Controller ======
 	Controller controller0(
-		.OpCode(InstOpCode)
+		.OpCode(InstOpCode),
 		.Funct(InstFunct),
 		.IRQ(BeginInterrupt),
 		.PCSrc(PCSrc),
@@ -144,10 +142,12 @@ module single_cycle_core(clk,
 	assign LU_out = LuOp? {InstImmediate[15:0], 16'h0000}: Ext_out;
 	
 	//====== ALU ======
-	ALUController alucontroller0(.ALUOp(ALUOp), .OpCode(InstOpCode), .Funct(InstFunct), .ALUFunc(ALUFunc), .Sign(ALUSign));
+	ALUController alucontroller0(.ALUOp(ALUOp), .OpCode(InstOpCode), .Funct(InstFunct), .ALUFunc(ALUFunc), .Sign(ALUSign), .IsJrJal(IsJrJal));
 	assign ALUIn1 = ALUSrc1? {17'h00000, InstShamt}: RegReadData1;
 	assign ALUIn2 = ALUSrc2? LU_out: RegReadData2;
-	ALU alu0(.iA(ALUIn1), .iB(ALUIn2), .iALUFun(ALUFunc), .iSign(ALUSign), .oS(ALUOut), .oZ(ALUZero), .oV(ALUOverflow), .oN(ALUNegative));
+	ALU alu0(ALUIn1, ALUIn2, ALUFunc, ALUSign, ALUOut, ALUZero);
+	assign ALUOverflow = 0;
+	//ALU alu0(.iA(ALUIn1), .iB(ALUIn2), .iALUFun(ALUFunc), .iSign(ALUSign), .oS(ALUOut), .oZ(ALUZero), .oV(ALUOverflow), .oN(ALUNegative));
 	
 	//====== Direct Jump Target ======
 	assign JumpTarget = {PC_plus_4[31:28], InstJumpAddr, 2'b00};
@@ -156,7 +156,7 @@ module single_cycle_core(clk,
 	//***************************
 	//This needs further improvement!
 	//***************************
-	assign BranchTarget = (ALUZero)? PC_plus_4 + {LU_out[29:0], 2'b00}: PC_plus_4;
+	assign BranchTarget = (ALUOut[0])? PC_plus_4 + {LU_out[29:0], 2'b00}: PC_plus_4;
 	
 	//====== Memory Access Signal ======
 	assign oMemAddr = ALUOut;

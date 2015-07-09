@@ -1,7 +1,6 @@
 `timescale 1ns/1ps
-//Incomplete
 //2013011076 Wang Han
-//Controller, incomplete
+//Single Cycle Controller
 
 module Controller ( OpCode,
 					Funct,
