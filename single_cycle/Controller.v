@@ -57,6 +57,16 @@ module Controller ( OpCode,
 		(OpCode == 6'h03 || (OpCode == 6'h00 && Funct == 6'h09)) ? 2'b10 :
 		2'b00;
 		
+	assign ALUSrc1 = (OpCode == 6'h00 && Funct <= 6'h03) ? 1'b1 : 1'b0;
+	assign ALUSrc2 = (OpCode >= 6'h08) ? 1'b1 : 1'b0;
 	
+	assign ExtOp = (OpCode == 6'h09 || OpCode == 6'h0b || OpCode == 6'h0c) ? 1'b0 : 1'b1;
 	
+	assign LuOp = (OpCode == 6'h0f) ? 1'b1 : 1'b0;
+	
+	assign ALUOp = (OpCode == 6'h00)? 2'b10: 
+				(OpCode == 6'h04)? 2'b01: 
+				(OpCode == 6'h23 || OpCode == 6'h2b || OpCode == 6'h0f)? 2'b00: 
+				2'b11;
+		
 endmodule
