@@ -9,14 +9,14 @@ reg [31:0] ROM_DATA[ROM_SIZE-1:0];
 
 always@(*)
 	case (addr[9:2])
-			// lui $a0,0x4000
-			8'd0:    data <= 32'h3c044000;
-			// addiu $a0,$a0,0x000c
-			8'd1:    data <= 32'h2484000c;
-			// addiu $a1,$zero,0x0005
-			8'd2:    data <= 32'h24050005;
-			// sw $a1,0($a0)
-			8'd3:    data <= 32'hac850000;
+			// lui $t0,0x4000
+			8'd0:    data <= 32'h3c084000;
+			// addiu $t0,$t0,0x000c
+			8'd1:    data <= 32'h2508000c;
+			// lw $a0,4($t0)
+			8'd2:    data <= 32'h8d040004;
+			// sw $a0,0($t0)
+			8'd3:    data <= 32'had040000;
 			// stop: j stop
 			8'd4:    data <= 32'h08000004;
 			default: data <= 32'h00000000;

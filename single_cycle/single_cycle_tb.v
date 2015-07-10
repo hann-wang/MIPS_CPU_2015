@@ -20,6 +20,7 @@ module single_cycle_tb;
 		reset = 0;
 		clk = 0;
 		#100 reset = 1;
+		switch = 8'b01001010;
 	end
 	
 	always #50 clk = ~clk;
