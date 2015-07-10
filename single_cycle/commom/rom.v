@@ -1,87 +1,43 @@
 `timescale 1ns/1ps
 
 module ROM (addr,data);
-input [31:0] addr;
-output [31:0] data;
-reg [31:0] data;
-//localparam ROM_SIZE = 32;
-//reg [31:0] ROM_DATA[ROM_SIZE-1:0];
+	input [31:0] addr;
+	output [31:0] data;
+	
+	localparam ROM_SIZE = 32;
+	parameter ROM_SIZE_BIT = 5;
+	
+	reg [31:0] ROM_DATA[ROM_SIZE-1:0];
+	
+	initial
+	begin
+		ROM_DATA[0]<=32'h0800000c;
+		ROM_DATA[1]<=32'h08000003;
+		ROM_DATA[2]<=32'h08000002;
+		ROM_DATA[3]<=32'h8ef90008;
+		ROM_DATA[4]<=32'h3339fff9;
+		ROM_DATA[5]<=32'haef90008;
+		ROM_DATA[6]<=32'h24180140;
+		ROM_DATA[7]<=32'haef80014;
+		ROM_DATA[8]<=32'h23390002;
+		ROM_DATA[9]<=32'haef90008;
+		ROM_DATA[10]<=32'h235afffc;
+		ROM_DATA[11]<=32'h03400008;
+		ROM_DATA[12]<=32'h20190038;
+		ROM_DATA[13]<=32'h03200008;
+		ROM_DATA[14]<=32'h3c174000;
+		ROM_DATA[15]<=32'haee00008;
+		ROM_DATA[16]<=32'h3c19ffff;
+		ROM_DATA[17]<=32'h27393caf;
+		ROM_DATA[18]<=32'haef90000;
+		ROM_DATA[19]<=32'h0000c827;
+		ROM_DATA[20]<=32'haef90004;
+		ROM_DATA[21]<=32'h24190003;
+		ROM_DATA[22]<=32'haef90008;
+		ROM_DATA[23]<=32'h08000017;
+	end
+	
+	assign data = ROM_DATA[addr[ROM_SIZE_BIT + 1:2]];
+	
 
-always@(*)
-	case (addr[9:2])
-			// j main
-			8'd0:    data <= 32'h0800000b;
-			// j interrupt
-			8'd1:    data <= 32'h08000003;
-			// error: j error
-			8'd2:    data <= 32'h08000002;
-			// interrupt: lw $t1, 8($a0)
-			8'd3:    data <= 32'h8c890008;
-			// andi $t1, $t1, 0xfff9
-			8'd4:    data <= 32'h3129fff9;
-			// sw $t1, 8($a0)
-			8'd5:    data <= 32'hac890008;
-			// sw $26, 12($a0)	
-			8'd6:    data <= 32'hac9a000c;
-			// addi $t1, $t1, 2
-			8'd7:    data <= 32'h21290002;
-			// sw $t1, 8($a0)
-			8'd8:    data <= 32'hac890008;
-			// addiu $26, $26, -4
-			8'd9:    data <= 32'h275afffc;
-			// jr $26
-			8'd10:    data <= 32'h03400008;
-			// main: addiu, $t9, $zero, 0x0034
-			8'd11:    data <= 32'h24190034;
-			// jr $t9
-			8'd12:    data <= 32'h03200008;
-			// lui $a0, 0x4000
-			8'd13:    data <= 32'h3c044000;
-			// sw $zero, 8($a0)
-			8'd14:    data <= 32'hac880008;
-			// lui $t0, 0xffff
-			8'd15:    data <= 32'h3c08ffff;
-			// addiu $t0, $t0, 0x3caf
-			8'd16:    data <= 32'h25083caf;
-			// sw $t0, 0($a0)
-			8'd17:    data <= 32'hac880000;
-			// nor $t0,$zero,$zero
-			8'd18:    data <= 32'h00004027;
-			// sw $t0, 4($a0)
-			8'd19:    data <= 32'hac880004;
-			// addiu $t0, $zero, 3
-			8'd20:    data <= 32'h24080003;
-			// sw $t0, 8($a0)
-			8'd21:    data <= 32'hac880008;
-			// stop: j stop
-			8'd22:    data <= 32'h08000016;
-			default: data <= 32'h00000000;
-		endcase
-	/*
-	case(addr[7:2])	//Address Must Be Word Aligned.
-		0: data <= 32'h3c114000;
-		1: data <= 32'h26310004;
-		2: data <= 32'h241000aa;
-		3: data <= 32'hae200000;
-		4: data <= 32'h08100000;
-		5: data <= 32'h0c000000;
-		6: data <= 32'h00000000;
-		7: data <= 32'h3402000a;
-		8: data <= 32'h0000000c;
-		9: data <= 32'h0000_0000;
-		10: data <= 32'h0274_8825;
-		11: data <= 32'h0800_0015;
-		12: data <= 32'h0274_8820;
-		13: data <= 32'h0800_0015;
-		14: data <= 32'h0274_882A;
-		15: data <= 32'h1011_0002;
-		16: data <= 32'h0293_8822;
-		17: data <= 32'h0800_0015;
-		18: data <= 32'h0274_8822;
-		19: data <= 32'h0800_0015; 
-		20: data <= 32'h0274_8824;
-		21: data <= 32'hae11_0003;
-		22: data <= 32'h0800_0001;
-	   default:	data <= 32'h0800_0000;
-	endcase*/
 endmodule
