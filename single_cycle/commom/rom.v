@@ -1,5 +1,7 @@
 `timescale 1ns/1ps
-
+//2013011076 Wang Han
+//This version of ROM uses $readmemh to initialize ROM.
+//Instruction should be written in HEX.
 module ROM (addr,data);
 	input [31:0] addr;
 	output [31:0] data;

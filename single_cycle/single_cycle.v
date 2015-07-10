@@ -1,7 +1,8 @@
 `timescale 1ns/1ps
-//Incomplete
 //2013011076 Wang Han
 //single_cycle, Top Level Module
+//This module connect the CPU core to peripherals like LEDs, switches, timer and UART.
+//Clock is also generated here.
 
 module single_cycle(sysclk,reset,switch,digi1,digi2,digi3,digi4,led);
 

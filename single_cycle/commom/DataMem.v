@@ -1,6 +1,7 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
-//DataMemory, forbid reading or writing to address begining with 4
+//DataMemory
+//Reading or Writing to address begining with 4 is FORBIDDEN
 
 module DataMem (reset,clk,rd,wr,addr,wdata,rdata);
 	input reset,clk;

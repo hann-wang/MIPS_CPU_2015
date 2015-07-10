@@ -1,6 +1,7 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
-//single_cycle_core, without outer device access
+//single_cycle_core, only Instruction ROM, Register File, ALU & Controller are accessible here.
+//CPU should communicate with Memory and other peripheral through the top module.
 
 module single_cycle_core(clk,
 						reset, 

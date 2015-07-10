@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-//Incomplete
+
 //2013011076 Wang Han
 //single_cycle_tb
 

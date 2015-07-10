@@ -1,4 +1,6 @@
-
+`timescale 1ns/1ps
+//2013011076 Wang Han
+//This ALU is for DEBUG only.
 module ALU(in1, in2, ALUCtl, Sign, out, zero);
 	input [31:0] in1, in2;
 	input [5:0] ALUCtl;

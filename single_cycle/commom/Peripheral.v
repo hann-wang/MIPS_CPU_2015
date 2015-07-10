@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
-//Connect to DataMem
-//UART support is to be continued...
+//Provide connection to Memory, timer, LEDs, switches and UART.
+//UART is temporarily missing...
 
 module Peripheral (reset,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqout);
 	//===== I/O =====

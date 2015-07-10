@@ -1,6 +1,7 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
 //ALU Controller
+//ORI is added!
 
 `define OPCODE_RSTYLE       6'h00
 `define OPCODE_LW           6'h23

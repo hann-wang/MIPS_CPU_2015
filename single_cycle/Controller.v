@@ -1,6 +1,7 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
 //Single Cycle Controller
+//ORI is added!
 
 module Controller ( OpCode,
 					Funct,
