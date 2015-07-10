@@ -14,6 +14,7 @@
 `define FUNCT_SUBU          6'h23
 `define FUNCT_AND           6'h24
 `define OPCODE_ANDI         6'h0c
+`define OPCODE_ORI          6'h0d
 `define FUNCT_OR            6'h25
 `define FUNCT_XOR           6'h26
 `define FUNCT_NOR           6'h27
@@ -130,6 +131,8 @@ module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign,IsJrJal);
 							end   
 						`OPCODE_ANDI:
 							ALUFunc = `ALUFUNC_AND;
+						`OPCODE_ORI:
+							ALUFunc = `ALUFUNC_OR;
 						`OPCODE_SLTI:
 							begin
 								ALUFunc = `ALUFUNC_LT;   Sign = 1'b1;

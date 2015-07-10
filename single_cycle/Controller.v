@@ -59,7 +59,7 @@ module Controller ( OpCode,
 	assign ALUSrc1 = (OpCode == 6'h00 && Funct <= 6'h03) ? 1'b1 : 1'b0;
 	assign ALUSrc2 = (OpCode >= 6'h08) ? 1'b1 : 1'b0;
 	
-	assign ExtOp = (OpCode == 6'h09 || OpCode == 6'h0b || OpCode == 6'h0c) ? 1'b0 : 1'b1;
+	assign ExtOp = (OpCode == 6'h09 || OpCode == 6'h0b || OpCode == 6'h0c || OpCode == 6'h0d) ? 1'b0 : 1'b1;
 	
 	assign LuOp = (OpCode == 6'h0f) ? 1'b1 : 1'b0;
 	

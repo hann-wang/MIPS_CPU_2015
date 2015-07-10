@@ -11,9 +11,9 @@ sw $t1, 8($a0)			#TCON |= 0x0002
 addiu $26, $26, -4
 jr $26
 
-main: addiu, $t9, $zero, 0x0034
+main: la $t9, start_point
 jr $t9				#clear PC[31]
-lui $a0, 0x4000
+start_point: lui $a0, 0x4000
 sw $zero, 8($a0)		#TCON=0
 lui $t0, 0xffff
 addiu $t0, $t0, 0x3caf
