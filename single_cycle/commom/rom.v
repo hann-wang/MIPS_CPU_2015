@@ -10,7 +10,7 @@ reg [31:0] data;
 always@(*)
 	case (addr[9:2])
 			// j main
-			8'd0:    data <= 32'h0800000a;
+			8'd0:    data <= 32'h0800000b;
 			// j interrupt
 			8'd1:    data <= 32'h08000003;
 			// error: j error
@@ -27,32 +27,34 @@ always@(*)
 			8'd7:    data <= 32'h21290002;
 			// sw $t1, 8($a0)
 			8'd8:    data <= 32'hac890008;
+			// addiu $26, $26, -4
+			8'd9:    data <= 32'h275afffc;
 			// jr $26
-			8'd9:    data <= 32'h03400008;
-			// main: addiu, $t9, $zero, 0x0030
-			8'd10:    data <= 32'h24190030;
+			8'd10:    data <= 32'h03400008;
+			// main: addiu, $t9, $zero, 0x0034
+			8'd11:    data <= 32'h24190034;
 			// jr $t9
-			8'd11:    data <= 32'h03200008;
+			8'd12:    data <= 32'h03200008;
 			// lui $a0, 0x4000
-			8'd12:    data <= 32'h3c044000;
+			8'd13:    data <= 32'h3c044000;
 			// sw $zero, 8($a0)
-			8'd13:    data <= 32'hac880008;
+			8'd14:    data <= 32'hac880008;
 			// lui $t0, 0xffff
-			8'd14:    data <= 32'h3c08ffff;
+			8'd15:    data <= 32'h3c08ffff;
 			// addiu $t0, $t0, 0x3caf
-			8'd15:    data <= 32'h25083caf;
+			8'd16:    data <= 32'h25083caf;
 			// sw $t0, 0($a0)
-			8'd16:    data <= 32'hac880000;
+			8'd17:    data <= 32'hac880000;
 			// nor $t0,$zero,$zero
-			8'd17:    data <= 32'h00004027;
+			8'd18:    data <= 32'h00004027;
 			// sw $t0, 4($a0)
-			8'd18:    data <= 32'hac880004;
+			8'd19:    data <= 32'hac880004;
 			// addiu $t0, $zero, 3
-			8'd19:    data <= 32'h24080003;
+			8'd20:    data <= 32'h24080003;
 			// sw $t0, 8($a0)
-			8'd20:    data <= 32'hac880008;
+			8'd21:    data <= 32'hac880008;
 			// stop: j stop
-			8'd21:    data <= 32'h08000015;
+			8'd22:    data <= 32'h08000016;
 			default: data <= 32'h00000000;
 		endcase
 	/*
