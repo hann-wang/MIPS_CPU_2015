@@ -1,0 +1,132 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 1991-2013 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus II 64-Bit
+# Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
+# Date created = 23:15:11  July 09, 2015
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		single_cycle_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus II software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "Cyclone II"
+set_global_assignment -name DEVICE EP2C35F672C6
+set_global_assignment -name TOP_LEVEL_ENTITY single_cycle
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "23:15:11  JULY 09, 2015"
+set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
+set_global_assignment -name DEVICE_FILTER_PIN_COUNT 672
+set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 6
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim (Verilog)"
+set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_simulation
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH single_cycle_tb -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_NAME single_cycle_tb -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id single_cycle_tb
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 us" -section_id single_cycle_tb
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME single_cycle_tb -section_id single_cycle_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE single_cycle_tb.v -section_id single_cycle_tb
+set_global_assignment -name USE_CONFIGURATION_DEVICE ON
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
+set_global_assignment -name VERILOG_FILE clk_gen.v
+set_global_assignment -name VERILOG_FILE commom/Peripheral.v
+set_global_assignment -name VERILOG_FILE commom/digitube_scan.v
+set_global_assignment -name VERILOG_FILE ALU.v
+set_global_assignment -name VERILOG_FILE commom/rom.v
+set_global_assignment -name VERILOG_FILE commom/regfile.v
+set_global_assignment -name VERILOG_FILE commom/DataMem.v
+set_global_assignment -name VERILOG_FILE single_cycle_tb.v
+set_global_assignment -name VERILOG_FILE single_cycle_core.v
+set_global_assignment -name VERILOG_FILE single_cycle.v
+set_global_assignment -name VERILOG_FILE Controller.v
+set_global_assignment -name VERILOG_FILE ALUController.v
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
+set_location_assignment PIN_V13 -to digi1[6]
+set_location_assignment PIN_V14 -to digi1[5]
+set_location_assignment PIN_AE11 -to digi1[4]
+set_location_assignment PIN_AD11 -to digi1[3]
+set_location_assignment PIN_AC12 -to digi1[2]
+set_location_assignment PIN_AB12 -to digi1[1]
+set_location_assignment PIN_AF10 -to digi1[0]
+set_location_assignment PIN_AB24 -to digi2[6]
+set_location_assignment PIN_AA23 -to digi2[5]
+set_location_assignment PIN_AA24 -to digi2[4]
+set_location_assignment PIN_Y22 -to digi2[3]
+set_location_assignment PIN_W21 -to digi2[2]
+set_location_assignment PIN_V21 -to digi2[1]
+set_location_assignment PIN_V20 -to digi2[0]
+set_location_assignment PIN_Y24 -to digi3[6]
+set_location_assignment PIN_AB25 -to digi3[5]
+set_location_assignment PIN_AB26 -to digi3[4]
+set_location_assignment PIN_AC26 -to digi3[3]
+set_location_assignment PIN_AC25 -to digi3[2]
+set_location_assignment PIN_V22 -to digi3[1]
+set_location_assignment PIN_AB23 -to digi3[0]
+set_location_assignment PIN_W24 -to digi4[6]
+set_location_assignment PIN_U22 -to digi4[5]
+set_location_assignment PIN_Y25 -to digi4[4]
+set_location_assignment PIN_Y26 -to digi4[3]
+set_location_assignment PIN_AA26 -to digi4[2]
+set_location_assignment PIN_AA25 -to digi4[1]
+set_location_assignment PIN_Y23 -to digi4[0]
+set_location_assignment PIN_AC21 -to led[7]
+set_location_assignment PIN_AD21 -to led[6]
+set_location_assignment PIN_AD23 -to led[5]
+set_location_assignment PIN_AD22 -to led[4]
+set_location_assignment PIN_AC22 -to led[3]
+set_location_assignment PIN_AB21 -to led[2]
+set_location_assignment PIN_AF23 -to led[1]
+set_location_assignment PIN_AE23 -to led[0]
+set_location_assignment PIN_G26 -to reset
+set_location_assignment PIN_C13 -to switch[7]
+set_location_assignment PIN_AC13 -to switch[6]
+set_location_assignment PIN_AD13 -to switch[5]
+set_location_assignment PIN_AF14 -to switch[4]
+set_location_assignment PIN_AE14 -to switch[3]
+set_location_assignment PIN_P25 -to switch[2]
+set_location_assignment PIN_N26 -to switch[1]
+set_location_assignment PIN_N25 -to switch[0]
+set_location_assignment PIN_N2 -to sysclk
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
+set_global_assignment -name SMART_RECOMPILE ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT NORMAL
+set_global_assignment -name CDF_FILE output_files/single_cycle.cdf
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
