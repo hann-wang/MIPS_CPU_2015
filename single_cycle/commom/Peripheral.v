@@ -23,9 +23,8 @@ module Peripheral (reset,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqout);
 	reg [2:0] TCON;
 	assign irqout = TCON[2];
 	//===== Memory =====
-	reg [31:0] MemWriteData;
 	wire [31:0] MemReadData;
-	DataMem datamem0(.reset(reset),.clk(clk),.rd(rd),.wr(wr),.addr(addr),.wdata(MemWriteData),.rdata(MemReadData));
+	DataMem datamem0(.reset(reset),.clk(clk),.rd(rd),.wr(wr),.addr(addr),.wdata(wdata),.rdata(MemReadData));
 
 	always@(*) begin
 		if(rd) begin
@@ -65,7 +64,7 @@ module Peripheral (reset,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqout);
 					32'h40000008: TCON <= wdata[2:0];		
 					32'h4000000C: led <= wdata[7:0];			
 					32'h40000014: digi <= wdata[11:0];
-					default: MemWriteData <= wdata;
+					default: ;
 				endcase
 			end
 		end

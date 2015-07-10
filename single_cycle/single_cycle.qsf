@@ -55,17 +55,6 @@ set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VERILOG_FILE ALU.v
-set_global_assignment -name VERILOG_FILE commom/rom.v
-set_global_assignment -name VERILOG_FILE commom/regfile.v
-set_global_assignment -name VERILOG_FILE commom/DataMem.v
-set_global_assignment -name VERILOG_FILE single_cycle_tb.v
-set_global_assignment -name VERILOG_FILE single_cycle_core.v
-set_global_assignment -name VERILOG_FILE single_cycle.v
-set_global_assignment -name VERILOG_FILE isa_define.v
-set_global_assignment -name VERILOG_FILE Controller.v
-set_global_assignment -name VERILOG_FILE ALUController.v
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
 set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH single_cycle_tb -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME single_cycle_tb -section_id eda_simulation
@@ -73,3 +62,15 @@ set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id single_cycle
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 us" -section_id single_cycle_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME single_cycle_tb -section_id single_cycle_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE single_cycle_tb.v -section_id single_cycle_tb
+set_global_assignment -name VERILOG_FILE commom/Peripheral.v
+set_global_assignment -name VERILOG_FILE commom/digitube_scan.v
+set_global_assignment -name VERILOG_FILE ALU.v
+set_global_assignment -name VERILOG_FILE commom/rom.v
+set_global_assignment -name VERILOG_FILE commom/regfile.v
+set_global_assignment -name VERILOG_FILE commom/DataMem.v
+set_global_assignment -name VERILOG_FILE single_cycle_tb.v
+set_global_assignment -name VERILOG_FILE single_cycle_core.v
+set_global_assignment -name VERILOG_FILE single_cycle.v
+set_global_assignment -name VERILOG_FILE Controller.v
+set_global_assignment -name VERILOG_FILE ALUController.v
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

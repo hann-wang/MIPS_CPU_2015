@@ -20,7 +20,7 @@ module DataMem (reset,clk,rd,wr,addr,wdata,rdata);
 	/*always@(posedge clk) begin
 		if(wr && (addr < RAM_SIZE)) RAMDATA[addr[31:2]]<=wdata;
 	end*/
-	always @(posedge reset or posedge clk)
+	always @(posedge clk)
 		if (wr && addr[31:28]!=4'h4)
 			RAMDATA[addr[RAM_SIZE_BIT + 1:2]] <= wdata;
 
