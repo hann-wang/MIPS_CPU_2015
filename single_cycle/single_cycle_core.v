@@ -1,5 +1,4 @@
 `timescale 1ns/1ps
-//Incomplete
 //2013011076 Wang Han
 //single_cycle_core, without outer device access
 
@@ -153,9 +152,6 @@ module single_cycle_core(clk,
 	assign JumpTarget = {PC_plus_4[31:28], InstJumpAddr, 2'b00};
 	
 	//====== Branch Target ======
-	//***************************
-	//This needs further improvement!
-	//***************************
 	assign BranchTarget = (ALUOut[0])? PC_plus_4 + {LU_out[29:0], 2'b00}: PC_plus_4;
 	
 	//====== Memory Access Signal ======
