@@ -4,21 +4,55 @@ module ROM (addr,data);
 input [31:0] addr;
 output [31:0] data;
 reg [31:0] data;
-localparam ROM_SIZE = 32;
-reg [31:0] ROM_DATA[ROM_SIZE-1:0];
+//localparam ROM_SIZE = 32;
+//reg [31:0] ROM_DATA[ROM_SIZE-1:0];
 
 always@(*)
 	case (addr[9:2])
-			// lui $t0,0x4000
-			8'd0:    data <= 32'h3c084000;
-			// addiu $t0,$t0,0x000c
-			8'd1:    data <= 32'h2508000c;
-			// lw $a0,4($t0)
-			8'd2:    data <= 32'h8d040004;
-			// sw $a0,0($t0)
-			8'd3:    data <= 32'had040000;
+			// j main
+			8'd0:    data <= 32'h0800000a;
+			// j interrupt
+			8'd1:    data <= 32'h08000003;
+			// error: j error
+			8'd2:    data <= 32'h08000002;
+			// interrupt: lw $t1, 8($a0)
+			8'd3:    data <= 32'h8c890008;
+			// andi $t1, $t1, 0xfff9
+			8'd4:    data <= 32'h3129fff9;
+			// sw $t1, 8($a0)
+			8'd5:    data <= 32'hac890008;
+			// sw $26, 12($a0)	
+			8'd6:    data <= 32'hac9a000c;
+			// addi $t1, $t1, 2
+			8'd7:    data <= 32'h21290002;
+			// sw $t1, 8($a0)
+			8'd8:    data <= 32'hac890008;
+			// jr $26
+			8'd9:    data <= 32'h03400008;
+			// main: addiu, $t9, $zero, 0x0030
+			8'd10:    data <= 32'h24190030;
+			// jr $t9
+			8'd11:    data <= 32'h03200008;
+			// lui $a0, 0x4000
+			8'd12:    data <= 32'h3c044000;
+			// sw $zero, 8($a0)
+			8'd13:    data <= 32'hac880008;
+			// lui $t0, 0xffff
+			8'd14:    data <= 32'h3c08ffff;
+			// addiu $t0, $t0, 0x3caf
+			8'd15:    data <= 32'h25083caf;
+			// sw $t0, 0($a0)
+			8'd16:    data <= 32'hac880000;
+			// nor $t0,$zero,$zero
+			8'd17:    data <= 32'h00004027;
+			// sw $t0, 4($a0)
+			8'd18:    data <= 32'hac880004;
+			// addiu $t0, $zero, 3
+			8'd19:    data <= 32'h24080003;
+			// sw $t0, 8($a0)
+			8'd20:    data <= 32'hac880008;
 			// stop: j stop
-			8'd4:    data <= 32'h08000004;
+			8'd21:    data <= 32'h08000015;
 			default: data <= 32'h00000000;
 		endcase
 	/*
