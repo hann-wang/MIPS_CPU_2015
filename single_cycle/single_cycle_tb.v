@@ -7,8 +7,14 @@ module single_cycle_tb;
 	
 	reg reset;
 	reg clk;
+	reg [7:0] switch;
+	wire [7:0] led;
+	wire [6:0] digi1;
+	wire [6:0] digi2;
+	wire [6:0] digi3;
+	wire [6:0] digi4;
 	
-	single_cycle cpu1(clk,reset);
+	single_cycle cpu0(clk,reset,switch,digi1,digi2,digi3,digi4,led);
 	
 	initial begin
 		reset = 0;

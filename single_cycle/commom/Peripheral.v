@@ -46,7 +46,9 @@ module Peripheral (reset,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqout);
 		if(~reset) begin
 			TH <= 32'b0;
 			TL <= 32'b0;
-			TCON <= 3'b0;	
+			TCON <= 3'b0;
+			led <= 8'b0;
+			digi <= 12'b0;
 		end
 		else begin
 			if(TCON[0]) begin	//timer is enabled

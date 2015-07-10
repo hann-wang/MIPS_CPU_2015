@@ -3,9 +3,9 @@
 //2013011076 Wang Han
 //single_cycle, Top Level Module
 
-module single_cycle(clk,reset,switch,digi1,digi2,digi3,digi4,led);
+module single_cycle(sysclk,reset,switch,digi1,digi2,digi3,digi4,led);
 
-	input			clk;
+	input			sysclk;
 	input			reset;
 	input	[7:0]	switch;
 	output	[6:0]	digi1;
@@ -21,7 +21,10 @@ module single_cycle(clk,reset,switch,digi1,digi2,digi3,digi4,led);
 	wire	[31:0]  MemReadData;
 	wire 			IRQ;
 	wire	[11:0]	digi;
-
+	wire 			clk;
+	
+	clk_gen clk_gen0(sysclk,clk);
+	
 	digitube_scan digitube_scan0(.digi_in(digi),.digi_out1(digi1),.digi_out2(digi2),.digi_out3(digi3),.digi_out4(digi4));
 
 	Peripheral peripheral0(.reset(reset),
