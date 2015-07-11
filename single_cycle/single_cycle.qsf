@@ -61,21 +61,8 @@ set_global_assignment -name EDA_TEST_BENCH_NAME single_cycle_tb -section_id eda_
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id single_cycle_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 us" -section_id single_cycle_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME single_cycle_tb -section_id single_cycle_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE single_cycle_tb.v -section_id single_cycle_tb
 set_global_assignment -name USE_CONFIGURATION_DEVICE ON
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
-set_global_assignment -name VERILOG_FILE clk_gen.v
-set_global_assignment -name VERILOG_FILE commom/Peripheral.v
-set_global_assignment -name VERILOG_FILE commom/digitube_scan.v
-set_global_assignment -name VERILOG_FILE ALU.v
-set_global_assignment -name VERILOG_FILE commom/rom.v
-set_global_assignment -name VERILOG_FILE commom/regfile.v
-set_global_assignment -name VERILOG_FILE commom/DataMem.v
-set_global_assignment -name VERILOG_FILE single_cycle_tb.v
-set_global_assignment -name VERILOG_FILE single_cycle_core.v
-set_global_assignment -name VERILOG_FILE single_cycle.v
-set_global_assignment -name VERILOG_FILE Controller.v
-set_global_assignment -name VERILOG_FILE ALUController.v
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
 set_location_assignment PIN_V13 -to digi1[6]
 set_location_assignment PIN_V14 -to digi1[5]
@@ -127,6 +114,18 @@ set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name SMART_RECOMPILE ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT NORMAL
-set_global_assignment -name CDF_FILE output_files/single_cycle.cdf
 set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
+set_global_assignment -name EDA_TEST_BENCH_FILE single_cycle_tb.v -section_id single_cycle_tb
+set_global_assignment -name VERILOG_FILE RegFile/regfile.v
+set_global_assignment -name VERILOG_FILE Peripheral/Peripheral.v
+set_global_assignment -name VERILOG_FILE Peripheral/digitube_scan.v
+set_global_assignment -name VERILOG_FILE Peripheral/DataMem.v
+set_global_assignment -name VERILOG_FILE InstructionROM/rom.v
+set_global_assignment -name VERILOG_FILE Controller/Controller.v
+set_global_assignment -name VERILOG_FILE Controller/ALUController.v
+set_global_assignment -name VERILOG_FILE ALU/ALU.v
+set_global_assignment -name VERILOG_FILE clk_gen.v
+set_global_assignment -name VERILOG_FILE single_cycle_core.v
+set_global_assignment -name VERILOG_FILE single_cycle.v
+set_global_assignment -name CDF_FILE output_files/single_cycle.cdf
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
