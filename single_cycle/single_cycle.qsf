@@ -116,6 +116,9 @@ set_global_assignment -name SMART_RECOMPILE ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT NORMAL
 set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 set_global_assignment -name EDA_TEST_BENCH_FILE single_cycle_tb.v -section_id single_cycle_tb
+set_global_assignment -name VERILOG_FILE Peripheral/uart_tx.v
+set_global_assignment -name VERILOG_FILE Peripheral/uart_rx.v
+set_global_assignment -name VERILOG_FILE Peripheral/uart_clk_gen.v
 set_global_assignment -name VERILOG_FILE RegFile/regfile.v
 set_global_assignment -name VERILOG_FILE Peripheral/Peripheral.v
 set_global_assignment -name VERILOG_FILE Peripheral/digitube_scan.v
@@ -128,4 +131,6 @@ set_global_assignment -name VERILOG_FILE clk_gen.v
 set_global_assignment -name VERILOG_FILE single_cycle_core.v
 set_global_assignment -name VERILOG_FILE single_cycle.v
 set_global_assignment -name CDF_FILE output_files/single_cycle.cdf
+set_location_assignment PIN_C25 -to rxd
+set_location_assignment PIN_B25 -to txd
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
