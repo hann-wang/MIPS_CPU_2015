@@ -75,9 +75,9 @@ module Controller ( OpCode,
 	
 	assign LuOp = (OpCode == 6'h0f) ? 1'b1 : 1'b0;
 	
-	assign ALUOp = (OpCode == 6'h00)? 2'b10: 
+	assign ALUOp = (OpCode == 6'h00)? 2'b00: 
 				(OpCode == 6'h04)? 2'b01: 
-				(OpCode == 6'h23 || OpCode == 6'h2b || OpCode == 6'h0f)? 2'b00: 
+				(OpCode == 6'h23 || OpCode == 6'h2b || OpCode == 6'h0f)? 2'b10: 
 				2'b11;
 		
 endmodule
