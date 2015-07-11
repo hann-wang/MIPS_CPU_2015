@@ -1,4 +1,9 @@
 ###########################################################
+# Last Modified: Jul-12, 2015
+###########################################################
+# READ ARGUMENTS -> DECODE ARGS -> FIND GCD -> SHOW GCD
+# INTERRUPT : CHANGE INDEX TO DISPLAY
+###########################################################
 #---------------- Assignment of Registers ----------------#
 # $s0: UART_CON ADDRESS     0x40000020
 # $s1: PARAMETER 1
@@ -26,28 +31,31 @@ MAIN:
     lui  $t0, 0x4000            # $t0 = 0x40000000
     addi $s0, $t0, 0x0020       # $s0 = 0x40000020
 
+###########################################################
+# Read 2 Arguments from UART
+# if (UART_CON[1] == 1) {
+#     Read Data
+# } else {
+#     Waiting till UART_CON[1] == 1
+# }
+###########################################################
+
 READ_LOOP_1:
-    # Read 1st argument from UART
+    # Read 1st Argument from UART
     lw  $t0, 0($s0)
     sll $t0, $t0, 30
-    srl $t0, $t0, 31    # $t0: 0 bit is RX_EFF
-    bne $t0, $zero, EXIT_READ_LOOP_1
-    j READ_LOOP_1
-
-EXIT_READ_LOOP_1:
-    # Collect the 1st argument
+    srl $t0, $t0, 31    # $t0 = UART_CON[1]
+    beq $t0, $zero, READ_LOOP_1
+    # If (UART_CON[1] == 1), Read data (1st Argument). 
     lw  $s1, -4($s0)
 
 READ_LOOP_2:
-    # Read 2nd argument from UART
+    # Read 2nd Argument from UART
     lw  $t0, 0($s0)
     sll $t0, $t0, 30
-    srl $t0, $t0, 31    # $t0: 0 bit is RX_EFF
-    bne $t0, $zero, EXIT_READ_LOOP_2
-    j READ_LOOP_2
-
-EXIT_READ_LOOP_2:
-    # Collect the 2nd argument
+    srl $t0, $t0, 31    # $t0 = UART_CON[1]
+    beq $t0, $zero, READ_LOOP_2
+    # If (UART_CON[1] == 1), Read data (2nd Argument). 
     lw  $s2, -4($s0)
 
 ###########################################################
@@ -58,7 +66,7 @@ EXIT_READ_LOOP_2:
 # mmmm is the index of value to display
 ###########################################################
 
-DECODEPARAMS: 
+DECODEARGS: 
     sll $a0, $s1, 24
     srl $a0, $a0, 28            # $a0 = $s1[7:4]
     jal DECODE
@@ -88,13 +96,13 @@ DECODEPARAMS:
     or $s7, $s7, $t0            # $s7 = ..._xxxxxxx_01110
 
     # set $t7 to 0
-    add $t7, $zero, $zero
+    addi $t7, $zero, 0
 
     # Find GCD (Greatest Common Divisor)
-    add $a0, $s1, $zero
-    add $a1, $s2, $zero
+    addi $a0, $s1, 0
+    addi $a1, $s2, 0
     jal GCD
-    add $s3, $v0, $zero
+    addi $s3, $v0, 0
 
     # Display result with LED
     sw  $s3, -20($s0)
@@ -119,6 +127,10 @@ SEND:
     j READ_LOOP_1
 
 ###########################################################
+#              BELOW this line are functions
+###########################################################
+
+###########################################################
 # $v0 = GCD($a0, $a1)
 ###########################################################
 
@@ -141,11 +153,11 @@ NOT_SWAP_CONTINUE:
     sub $t0, $t8, $t9
     beq $t0, $zero, GCD_RETURN
     # Else $t8 = $t8 - $t9, and continue to loop
-    add $t8, $t0, $zero
+    addi $t8, $t0, 0
     j GCD_LOOP
 
 GCD_RETURN:
-    add $v0, $t8, $zero
+    addi $v0, $t8, 0
     jr $ra
 
 ###########################################################
