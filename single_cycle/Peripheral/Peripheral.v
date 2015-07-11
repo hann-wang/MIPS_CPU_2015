@@ -9,8 +9,8 @@
 ////rx_data_store: the data received
 ////tx_data: the data to sending
 ////received: 1-data received & unread
-////sent: 1-data has been sent
-////tx_control: 1-tx enable
+////sent: 1-data has been sent (I don't think it is of any use...)
+////tx_control: 1-tx enable (must be set BEFORE writing to 0x40000018)
 ////rx_control: 1-rx enable 
 ////tx_status: 0-idle, 1-busy
 
