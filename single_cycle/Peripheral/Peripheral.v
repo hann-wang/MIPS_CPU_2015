@@ -79,7 +79,8 @@ module Peripheral (reset,sysclk,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqou
 			received <= 1'b0;
 			tx_data <= 8'b0;
 			rx_data_store <= 8'b0;
-			rx_status_buf <= 1'b0;
+			rx_status_buf <= 1'b1;
+			tx_en <= 1'b0;
 		end
 		else
 		begin
@@ -94,7 +95,7 @@ module Peripheral (reset,sysclk,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqou
 				else TL <= TL + 1;
 			end
 			
-			if (tx_status)
+			if (tx_en && tx_status)
 				tx_en <= 1'b0;							//If sending process has begun, restore tx_en to 0
 			
 			if (rx_control)								//UART receiver enabled
