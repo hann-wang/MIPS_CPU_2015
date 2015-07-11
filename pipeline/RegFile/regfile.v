@@ -10,8 +10,14 @@ input [31:0] data3;
 reg [31:0] RF_DATA[31:1];
 integer i;
 
-assign data1=(addr1==5'b0)?32'b0:RF_DATA[addr1];	//$0 MUST be all zeros
-assign data2=(addr2==5'b0)?32'b0:RF_DATA[addr2];
+//$0 MUST be all zeros
+//Resolve the conflict of read/write
+assign data1 = (addr1==5'b0)?32'b0:
+			(addr1==addr3)?data3:
+			RF_DATA[addr1];
+assign data2 = (addr2==5'b0)?32'b0:
+			(addr2==addr3)?data3:
+			RF_DATA[addr2];
 
 always@(negedge reset or posedge clk) begin
 	if(~reset) begin

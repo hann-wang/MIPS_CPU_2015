@@ -3,7 +3,7 @@
 //Pipeline top module
 //Incomplete!
 
-module pipline(sysclk,reset,switch,digi1,digi2,digi3,digi4,led,txd,rxd);
+module pipeline(sysclk,reset,switch,digi1,digi2,digi3,digi4,led,txd,rxd);
 
 	input			sysclk;
 	input			reset;

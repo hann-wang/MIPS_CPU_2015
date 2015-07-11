@@ -3,13 +3,13 @@
 //pipline_core
 
 module pipeline_core(clk,
-						reset, 
-						oMemAddr,
-						oMemWrite, 
-						oMemWriteData,
-						oMemRead, 
-						iMemReadData,
-						iInterrupt);
+					reset, 
+					oMemAddr,
+					oMemWrite, 
+					oMemWriteData,
+					oMemRead, 
+					iMemReadData,
+					iInterrupt);
 
 	//===== I/O =====
 	input			clk;
@@ -22,13 +22,14 @@ module pipeline_core(clk,
 	input			iInterrupt;
 
 	//===== Instruction =====
-	reg		[31:0]	IF_PC;
+	wire	[31:0]	IF_PC;
 	wire	[31:0]	IF_PC_plus_4;
 	wire	[31:0]	IF_Instruction;
 	wire	[31:0]	IF_PC_next_raw;
 	wire	[31:0]	IF_PC_next;
 	
 	wire	[31:0]	ID_PC_plus_4;
+	wire	[31:0]	ID_Instruction;
 	wire	[5:0]	ID_InstOpCode;
 	wire	[4:0]	ID_InstRs;
 	wire	[4:0]	ID_InstRt;
@@ -129,22 +130,23 @@ module pipeline_core(clk,
 	//========================
 	
 	//===== IF Stage =====
-	assign BeginInterrupt = (~PC[31])&iInterrupt;
+	assign BeginInterrupt = (~IF_PC[31])&iInterrupt;
 	
 	assign IF_PC_plus_4 = IF_PC + 32'd4;
 	assign IF_PC_next_raw =(ID_UndefinedInst) ? 32'h80000008:
 						(BeginInterrupt) ? 32'h80000004:
-						(ID_PCSrc == 2'b00) ? IF_PC_plus_4:
-						(ID_PCSrc == 2'b01) ? EX_MEM_BranchTarget:
-						(ID_PCSrc == 2'b10) ? IF_ID_JumpTarget:
+						(EX_PCSrc == 2'b00) ? IF_PC_plus_4:
+						(EX_PCSrc == 2'b01) ? EX_BranchTarget:
+						(EX_PCSrc == 2'b10) ? ID_JumpTarget:
 						ID_RegReadData1;
-	assign IF_PC_next = (BeginInterrupt|ID_IsJrJal) ? IF_PC_next_raw :
-                    {IF_PC[31],IF_PC_next_raw[30:0]};
+	/*assign IF_PC_next = (BeginInterrupt|ID_IsJrJal) ? IF_PC_next_raw :
+                    {IF_PC[31],IF_PC_next_raw[30:0]};*/
+	assign IF_PC_next = IF_PC_plus_4;
 	PC_reg PC_reg0(.clk(clk), .reset(reset), .PCWrite(1), .iPC(IF_PC_next), .oPC(IF_PC));
 	
 	ROM rom0(.addr(IF_PC),.data(IF_Instruction));
 	
-	IF_ID IF_ID0(.clk(clk),
+	IF_ID_reg IF_ID_reg0(.clk(clk),
 			.reset(reset),
 			.flush(0),
 			.IF_ID_write(1),
@@ -198,53 +200,47 @@ module pipeline_core(clk,
 	assign ID_JumpTarget = {ID_PC_plus_4[31:28], ID_InstJumpAddr, 2'b00};
 	
 	
-	ID_EX ID_EX0(.clk(clk),
+	ID_EX_reg ID_EX_reg0(.clk(clk),
 			.reset(reset),
 			.flush(0),
-			.ID_EX_write(1),
 			.iInstOpCode(ID_InstOpCode),
 			.iInstFunct(ID_InstFunct),
 			.iPC_plus_4(ID_PC_plus_4),
 			.iInstRt(ID_InstRt),
 			.iInstRd(ID_InstRd),
 			.iInstShamt(ID_InstShamt),
-			.iInstImmediate(ID_InstImmediate),
-			.iRegReadData1(ID_RegReadData1);
-			.iRegReadData2(ID_RegReadData2);
-			.iRegDst(ID_RegDst);
-			.iPCSrc(ID_PCSrc);
-			.iMemRead(ID_MemRead);
-			.iMemWrite(ID_MemWrite);
-			.iMemToReg(ID_MemToReg);
-			.iALUOp(ID_ALUOp);
-			.iALUSrc1(ID_ALUSrc1);
-			.iALUSrc2(ID_ALUSrc2);
-			.iRegWrite(ID_RegWrite);
-			.iExt_out(ID_Ext_out);
-			.iLU_out(ID_LU_out);
-			
+			.iRegReadData1(ID_RegReadData1),
+			.iRegReadData2(ID_RegReadData2),
+			.iRegDst(ID_RegDst),
+			.iPCSrc(ID_PCSrc),
+			.iMemRead(ID_MemRead),
+			.iMemWrite(ID_MemWrite),
+			.iMemToReg(ID_MemToReg),
+			.iALUOp(ID_ALUOp),
+			.iALUSrc1(ID_ALUSrc1),
+			.iALUSrc2(ID_ALUSrc2),
+			.iRegWrite(ID_RegWrite),
+			.iExt_out(ID_Ext_out),
+			.iLU_out(ID_LU_out),
 			.oInstOpCode(EX_InstOpCode),
 			.oInstFunct(EX_InstFunct),
 			.oPC_plus_4(EX_PC_plus_4),
 			.oInstRt(EX_InstRt),
 			.oInstRd(EX_InstRd),
 			.oInstShamt(EX_InstShamt),
-			.oInstImmediate(EX_InstImmediate),
-			.oRegReadData1(EX_RegReadData1);
-			.oRegReadData2(EX_RegReadData2);
-			.oRegDst(EX_RegDst);
-			.oPCSrc(EX_PCSrc);
-			.oMemRead(EX_MemRead);
-			.oMemWrite(EX_MemWrite);
-			.oMemToReg(EX_MemToReg);
-			.oALUOp(EX_ALUOp);
-			.oALUSrc1(EX_ALUSrc1);
-			.oALUSrc2(EX_ALUSrc2);
-			.oRegWrite(EX_RegWrite);
-			.oExt_out(EX_Ext_out);
-			.oLU_out(EX_LU_out);
-			
-			);
+			.oRegReadData1(EX_RegReadData1),
+			.oRegReadData2(EX_RegReadData2),
+			.oRegDst(EX_RegDst),
+			.oPCSrc(EX_PCSrc),
+			.oMemRead(EX_MemRead),
+			.oMemWrite(EX_MemWrite),
+			.oMemToReg(EX_MemToReg),
+			.oALUOp(EX_ALUOp),
+			.oALUSrc1(EX_ALUSrc1),
+			.oALUSrc2(EX_ALUSrc2),
+			.oRegWrite(EX_RegWrite),
+			.oExt_out(EX_Ext_out),
+			.oLU_out(EX_LU_out));
 	
 	
 	//====== EX Stage ======
@@ -253,33 +249,30 @@ module pipeline_core(clk,
 	assign EX_ALUIn2 = EX_ALUSrc2? EX_LU_out: EX_RegReadData2;
 	ALU alu0(EX_ALUIn1, EX_ALUIn2, EX_ALUFunc, EX_ALUSign, EX_ALUOut, EX_ALUZero);
 	
-	assign EX_BranchTarget = (EX_ALUOut[0])? EX_PC_plus_4 + {EX_LU_out[29:0], 2'b00}: EX_PC_plus_4;
+	assign EX_BranchTarget = (EX_ALUOut[0])? EX_PC_plus_4 + {EX_Ext_out[29:0], 2'b00}: EX_PC_plus_4;
 	
 	EX_MEM_reg EX_MEM_reg0(.clk(clk),
 							.reset(reset),
-							.flush(0),
-							.EX_MEM_write(1),
 							.iPC_plus_4(EX_PC_plus_4),
 							.iInstRt(EX_InstRt),
 							.iInstRd(EX_InstRd),
-							.iRegReadData2(EX_RegReadData2);
-							.iRegDst(EX_RegDst);
-							.iMemRead(EX_MemRead);
-							.iMemWrite(EX_MemWrite);
-							.iMemToReg(EX_MemToReg);
-							.iRegWrite(EX_RegWrite);
-							.iALUOut(EX_ALUOut);
+							.iRegReadData2(EX_RegReadData2),
+							.iRegDst(EX_RegDst),
+							.iMemRead(EX_MemRead),
+							.iMemWrite(EX_MemWrite),
+							.iMemToReg(EX_MemToReg),
+							.iRegWrite(EX_RegWrite),
+							.iALUOut(EX_ALUOut),
 							.oPC_plus_4(MEM_PC_plus_4),
 							.oInstRt(MEM_InstRt),
 							.oInstRd(MEM_InstRd),
-							.oRegReadData2(MEM_RegReadData2);
-							.oRegDst(MEM_RegDst);
-							.oMemRead(MEM_MemRead);
-							.oMemWrite(MEM_MemWrite);
-							.oMemToReg(MEM_MemToReg);
-							.oRegWrite(MEM_RegWrite);
-							.oALUOut(MEM_ALUOut);
-							);
+							.oRegReadData2(MEM_RegReadData2),
+							.oRegDst(MEM_RegDst),
+							.oMemRead(MEM_MemRead),
+							.oMemWrite(MEM_MemWrite),
+							.oMemToReg(MEM_MemToReg),
+							.oRegWrite(MEM_RegWrite),
+							.oALUOut(MEM_ALUOut));
 	//====== MEM Stage ======
 	assign oMemAddr = MEM_ALUOut;
 	assign oMemWrite = MEM_MemWrite;
@@ -288,21 +281,20 @@ module pipeline_core(clk,
 	
 	MEM_WB_reg MEM_WB_reg0(.clk(clk),
 							.reset(reset),
-							.flush(0),
-							.MEM_WB_write(1),
 							.iPC_plus_4(MEM_PC_plus_4),
 							.iInstRt(MEM_InstRt),
 							.iInstRd(MEM_InstRd),
-							.iRegDst(MEM_RegDst);
-							.iMemToReg(MEM_MemToReg);
-							.iRegWrite(MEM_RegWrite);
-							.iALUOut(MEM_ALUOut);
+							.iRegDst(MEM_RegDst),
+							.iMemToReg(MEM_MemToReg),
+							.iRegWrite(MEM_RegWrite),
+							.iALUOut(MEM_ALUOut),
+							.iMemReadData(iMemReadData),
 							.oPC_plus_4(WB_PC_plus_4),
 							.oInstRt(WB_InstRt),
 							.oInstRd(WB_InstRd),
-							.oRegDst(WB_RegDst);
-							.oMemToReg(WB_MemToReg);
-							.oRegWrite(WB_RegWrite);
-							.oALUOut(WB_ALUOut);
-							);
+							.oRegDst(WB_RegDst),
+							.oMemToReg(WB_MemToReg),
+							.oRegWrite(WB_RegWrite),
+							.oALUOut(WB_ALUOut),
+							.oMemReadData(WB_MemReadData));
 endmodule

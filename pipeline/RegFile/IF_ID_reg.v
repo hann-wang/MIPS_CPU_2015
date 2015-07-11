@@ -2,7 +2,7 @@
 //2013011076 Wang Han
 //IF_ID Register
 
-module IF_ID(clk,
+module IF_ID_reg(clk,
 			reset,
 			flush,
 			IF_ID_write,
@@ -17,8 +17,8 @@ module IF_ID(clk,
 			oInstShamt,
 			oInstFunct,
 			oInstImmediate,
-			oInstJumpAddr
-			);
+			oInstJumpAddr);
+
     input			clk;
     input			reset;
 	input 			flush;
@@ -27,26 +27,32 @@ module IF_ID(clk,
 	input	[31:0]	iPC_plus_4;
 	output	reg [31:0]	oPC_plus_4;
 	output	reg	[31:0]	oInstruction;
-	wire	[5:0]	oInstOpCode;
-	wire	[4:0]	oInstRs;
-	wire	[4:0]	oInstRt;
-	wire	[4:0]	oInstRd;
-	wire	[4:0]	oInstShamt;
-	wire	[5:0]	oInstFunct;
-	wire	[15:0]	oInstImmediate;
-	wire	[25:0]	oInstJumpAddr;
+	output	[5:0]	oInstOpCode;
+	output	[4:0]	oInstRs;
+	output	[4:0]	oInstRt;
+	output	[4:0]	oInstRd;
+	output	[4:0]	oInstShamt;
+	output	[5:0]	oInstFunct;
+	output	[15:0]	oInstImmediate;
+	output	[25:0]	oInstJumpAddr;
 	
 	always @(posedge clk or negedge reset) begin
-		if (~reset || flush)
+		if (~reset)
 		begin
 			oPC_plus_4 <= 32'h80000000;
 			oInstruction <= 32'h00000000;
 		end
 		else
 		begin
+			if (flush)
+			begin
+				oPC_plus_4 <= 32'h80000000;
+				oInstruction <= 32'h00000000;
+			end
+			else
 			if (IF_ID_write == 1'b1)
 			begin
-				oPPC_plus_4 <= iPC_plus_4;
+				oPC_plus_4 <= iPC_plus_4;
 				oInstruction <= iInstruction;
 			end
 		end

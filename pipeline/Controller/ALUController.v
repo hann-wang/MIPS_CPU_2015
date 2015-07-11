@@ -66,7 +66,7 @@ module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign,IsJrJal);
         Sign = 1'b0;
 		IsJrJal = 1'b0;
         case(ALUOp)
-			2'b00:
+			2'b10:
 				begin
 					ALUFunc = `ALUFUNC_ADD;
 					Sign = 1'b0;
@@ -76,7 +76,7 @@ module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign,IsJrJal);
 					ALUFunc = `ALUFUNC_EQ;
 					Sign = 1'b1;
 				end
-			2'b10:
+			2'b00:
 				begin
 					case (Funct)
 						`FUNCT_ADD:
