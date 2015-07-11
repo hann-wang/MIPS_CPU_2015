@@ -33,7 +33,7 @@ module single_cycle_core(clk,
 	wire	[5:0]	InstFunct;
 	wire	[15:0]	InstImmediate;
 	wire	[25:0]	InstJumpAddr;
-
+	wire			UndefinedInst;
 	//===== Register File =====
 	wire	[4:0]	RegWriteAddr;
 	wire	[31:0]	RegReadData1;
@@ -47,7 +47,6 @@ module single_cycle_core(clk,
 	wire			ALUSign;
 	wire	[5:0]	ALUFunc;
 	wire			ALUZero;
-	wire			ALUOverflow;
 	wire			ALUNegative;
 
 	//===== Controller =====
@@ -86,7 +85,7 @@ module single_cycle_core(clk,
 		else
 			PC <= PC_next;
 	end
-	assign PC_next_raw =(ALUOverflow) ? 32'h80000008:
+	assign PC_next_raw =(UndefinedInst) ? 32'h80000008:
 						(BeginInterrupt) ? 32'h80000004:
 						(PCSrc == 2'b00) ? PC_plus_4:
 						(PCSrc == 2'b01) ? BranchTarget:
@@ -122,7 +121,8 @@ module single_cycle_core(clk,
 		.ALUSrc2(ALUSrc2),
 		.ExtOp(ExtOp),
 		.LuOp(LuOp),
-		.ALUOp(ALUOp));
+		.ALUOp(ALUOp),
+		.UndefinedInst(UndefinedInst));
 
 	//===== Reg File Access =====
 	assign RegWriteAddr = (RegDst == 2'b00)? InstRt: (RegDst == 2'b01)? InstRd: (RegDst == 2'b10)? 5'b11111 : 5'd26;
@@ -146,7 +146,6 @@ module single_cycle_core(clk,
 	assign ALUIn1 = ALUSrc1? {17'h00000, InstShamt}: RegReadData1;
 	assign ALUIn2 = ALUSrc2? LU_out: RegReadData2;
 	ALU alu0(ALUIn1, ALUIn2, ALUFunc, ALUSign, ALUOut, ALUZero);
-	assign ALUOverflow = 0;
 	//ALU alu0(.iA(ALUIn1), .iB(ALUIn2), .iALUFun(ALUFunc), .iSign(ALUSign), .oS(ALUOut), .oZ(ALUZero), .oV(ALUOverflow), .oN(ALUNegative));
 	
 	//====== Direct Jump Target ======
