@@ -16,7 +16,8 @@ module Controller ( OpCode,
 					ALUSrc2,
 					ExtOp,
 					LuOp,
-					ALUOp);
+					ALUOp,
+					UndefinedInst);
 	input  [5:0] OpCode;
 	input  [5:0] Funct;
 	input 	IRQ;
@@ -31,7 +32,17 @@ module Controller ( OpCode,
 	output ExtOp;
 	output LuOp;
 	output [1:0] ALUOp;
+	output UndefinedInst;
 	
+	assign UndefinedInst =  (OpCode[4]) ? 1'b1 :
+							(OpCode[5]) ? ((OpCode[3:0]==4'h3 || OpCode[3:0]==4'hb)?1'b0:1'b1) :
+							(OpCode[3:0]==4'he) ? 1'b1 :
+							(OpCode[3:0]==4'h0) ? ( (Funct[4]) ? 1'b1 :
+													(Funct[5]) ? ((Funct[3:0]<4'h8)?1'b0:1'b1) :
+													(Funct[3:0]==4'h0 || Funct[3:0]==4'h2 || Funct[3:0]==4'h3 || Funct[3:0]==4'h8 || Funct[3:0]==4'h9 || Funct[3:0]==4'ha) ? 1'b0 : 1'b1
+													) :
+							1'b0;
+													
 	assign PCSrc =
 		(OpCode == 6'h02 || OpCode == 6'h03) ? 2'b10 :
 		(OpCode == 6'h00 && (Funct == 6'h08 || Funct == 6'h09)) ? 2'b11 :

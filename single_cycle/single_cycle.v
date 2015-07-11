@@ -4,16 +4,18 @@
 //This module connect the CPU core to peripherals like LEDs, switches, timer and UART.
 //Clock is also generated here.
 
-module single_cycle(sysclk,reset,switch,digi1,digi2,digi3,digi4,led);
+module single_cycle(sysclk,reset,switch,digi1,digi2,digi3,digi4,led,txd,rxd);
 
 	input			sysclk;
 	input			reset;
 	input	[7:0]	switch;
+	input			rxd;
 	output	[6:0]	digi1;
 	output	[6:0]	digi2;
 	output	[6:0]	digi3;
 	output	[6:0]	digi4;
 	output	[7:0]	led;
+	output			txd;
 	
 	wire	[31:0]	MemAddr;
 	wire			MemWrite;
@@ -29,6 +31,7 @@ module single_cycle(sysclk,reset,switch,digi1,digi2,digi3,digi4,led);
 	digitube_scan digitube_scan0(.digi_in(digi),.digi_out1(digi1),.digi_out2(digi2),.digi_out3(digi3),.digi_out4(digi4));
 
 	Peripheral peripheral0(.reset(reset),
+						.sysclk(sysclk),
 						.clk(clk),
 						.rd(MemRead),
 						.wr(MemWrite),
@@ -38,7 +41,9 @@ module single_cycle(sysclk,reset,switch,digi1,digi2,digi3,digi4,led);
 						.led(led),
 						.switch(switch),
 						.digi(digi),
-						.irqout(IRQ));
+						.irqout(IRQ),
+						.txd(txd),
+						.rxd(rxd));
 
 	single_cycle_core single_cycle_core0(.clk(clk),
 										.reset(reset),
