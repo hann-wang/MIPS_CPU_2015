@@ -1,20 +1,28 @@
-j MAIN
-j INTERRUPT
-j EXCEPTION
+###########################################################
+################# Assignment of Registers #################
+# $s0: UART_CON ADDRESS     0x40000020
+# $s1: PARAMETER 1
+# $s2: PARAMETER 2
+# $s3: GREATEST COMMON DIVISOR
+# $s4: DECODE AN0
+# $s5: DECODE AN1
+# $s6: DECODE AN2
+# $s7: DECODE AN3
+# $t7: INDEX OF AN TO SHOW
+###########################################################
+################ Addresses of Peripherals #################
+# UART_CON:             0X40000020 = 0($s0)
+# LEDs:                 0x4000000C = -20($s0)
+# 7-segment display:    0x40000014 = -12($s0)
+# UART_RX:              0x4000001C = -4($s0)
+# UART_TX:              0x40000018 = -8($s0)
+###########################################################
 
-MAIN: 
-    ##########################################
-    # $s0: UART_CON ADDRESS     0x40000020
-    # $s1: PARAMETER 1
-    # $s2: PARAMETER 2
-    # $s3: GREATEST COMMON DIVISOR
-    # $s4: DECODE AN0
-    # $s5: DECODE AN1
-    # $s6: DECODE AN2
-    # $s7: DECODE AN3
-    # $t7: INDEX OF AN TO SHOW
-    ##########################################
-    
+    j MAIN
+    j INTERRUPT
+    j EXCEPTION
+
+MAIN:     
     lui  $t0, 0x4000            # $t0 = 0x40000000
     addi $s0, $t0, 0x0020       # $s0 = 0x40000020 (addr of UART_CON)
 
@@ -43,35 +51,38 @@ EXIT_READ_LOOP_2:
     lw  $s2, -4($s0)
 
 ###########################################################
-# Use $s4(AN0), $s5(AN1) to store the 1st argument
-# Use $s6(AN2), $s7(AN3) to store the 2nd argument
+# SPECs SUBJECT TO CHANGE
+###########################################################
+# Using 7-segment display, format ..._xxxxxxx_0mmmm
+# xxxxxxx is the corresponding 7-segments
+# mmmm is the index of value to display
 ###########################################################
 
 DECODEPARAMS: 
     sll $a0, $s1, 24
-    srl $a0, $a0, 28
-    jal DECODER
+    srl $a0, $a0, 28            # $a0 = $s1[7:4]
+    jal DECODE
     sll $s4, $v0, 5
     addi $t0, $zero, 0x0007     # $t0 = ..._0000000_00111
     or $s4, $s4, $t0            # $s4 = ..._xxxxxxx_00111
 
     sll $a0, $s1, 28
-    srl $a0, $a0, 28
-    jal DECODER
+    srl $a0, $a0, 28            # $a0 = $s1[3:0]
+    jal DECODE
     sll $s5, $v0, 5
     addi $t0, $zero, 11         # $t0 = ..._0000000_01011
     or $s5, $s5, $t0            # $s5 = ..._xxxxxxx_01011
 
     sll $a0, $s2, 24
-    srl $a0, $a0, 28
-    jal DECODER
+    srl $a0, $a0, 28            # $a0 = $s2[7:4]
+    jal DECODE
     sll $s6, $v0, 5
     addi $t0, $zero, 13         # $t0 = ..._0000000_01101
     or $s6, $s6, $t0            # $s6 = ..._xxxxxxx_01101
 
     sll $a0, $s2, 28
-    srl $a0, $a0, 28
-    jal DECODER
+    srl $a0, $a0, 28            # $a0 = $s2[3:0]
+    jal DECODE
     sll $s7, $v0, 5
     addi $t0, $zero, 14         # $t0 = ..._0000000_01110
     or $s7, $s7, $t0            # $s7 = ..._xxxxxxx_01110
@@ -79,16 +90,16 @@ DECODEPARAMS:
     # set $t7 to 0
     add $t7, $zero, $zero
 
-    # find the greatest common divisor
+    # Find GCD (Greatest Common Divisor)
     add $a0, $s1, $zero
     add $a1, $s2, $zero
     jal GCD
     add $s3, $v0, $zero
 
-    # use the LEDs to show the result
+    # Display result with LED
     sw  $s3, -20($s0)
 
-    # save the result to UART_TXD
+    # Save result to UART_TXD
     sw  $s3, -8($s0)
 
 SEND_LOOP:
@@ -148,7 +159,7 @@ GCD_RETURN:
 
     jr $ra
 
-DECODER:
+DECODE:
     # take in an 4 bits number in $a0
     # decode it to an 7 bits DIGITs
     # retrun it in $v0
