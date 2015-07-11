@@ -17,7 +17,7 @@ module PC_reg(clk,
 	always @(posedge clk or negedge reset)
 	begin
 		if (~reset)
-			oPC <= 32'h00400000;
+			oPC <= 32'h80000000;
 		else
 		begin
 			if (PCWrite == 1'b1)
