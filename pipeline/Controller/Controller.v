@@ -43,11 +43,12 @@ module Controller ( OpCode,
 													) :
 							1'b0;
 													
-	assign PCSrc =
-		(OpCode == 6'h02 || OpCode == 6'h03) ? 3'b010 :
-		(OpCode == 6'h00 && (Funct == 6'h08 || Funct == 6'h09)) ? 3'b011 :
-		(OpCode >= 6'h01 && OpCode <= 6'h07) ? 3'b001 :
-		3'b000;
+	assign PCSrc = (UndefinedInst) ? 3'b101 :
+					(IRQ) ? 3'b100 :
+					(OpCode == 6'h02 || OpCode == 6'h03) ? 3'b010 :
+					(OpCode == 6'h00 && (Funct == 6'h08 || Funct == 6'h09)) ? 3'b011 :
+					(OpCode >= 6'h01 && OpCode <= 6'h07) ? 3'b001 :
+					3'b000;
 		
 	assign RegWrite = (IRQ) ? 1'b1 :
 			(OpCode == 6'h2b || (OpCode >= 6'h04 && OpCode <= 6'h07) || OpCode == 6'h01 || OpCode == 6'h02 || (OpCode == 6'h00 && Funct == 6'h08)) ? 1'b0 : 1'b1;

@@ -22,6 +22,8 @@ module pipeline_core(clk,
 	input			iInterrupt;
 
 	//===== Instruction =====
+	wire	[2:0]	PCSrc;
+	
 	wire	[31:0]	IF_PC;
 	wire	[31:0]	IF_PC_plus_4;
 	wire	[31:0]	IF_Instruction;
@@ -61,6 +63,7 @@ module pipeline_core(clk,
 	wire	[31:0]	ID_RegReadData2;
 	wire	[31:0]	EX_RegReadData1;
 	wire	[31:0]	EX_RegReadData2;
+	wire	[4:0]	EX_RegWriteAddr;
 	
 	wire	[31:0]	MEM_RegReadData2;
 	wire	[4:0]	MEM_RegWriteAddr;
@@ -130,7 +133,7 @@ module pipeline_core(clk,
 	
 	//====Forward Signal====
 	wire [1:0] EX_ForwardA, EX_ForwardB, EX_ForwardJr;
-	wire [31:0] EX_ForwardAData, EX_ForwardBData;
+	wire [31:0] EX_ForwardAData, EX_ForwardBData, EX_ForwardJrData;
 	//====Hazard Signal====
 	wire PCWrite, IF_ID_write, IF_ID_flush, ID_EX_flush;
 	//========================
@@ -139,18 +142,22 @@ module pipeline_core(clk,
 	
 	//===== IF Stage =====
 	assign BeginInterrupt = (~IF_PC[31])&iInterrupt;
+	assign PCSrc = (EX_PCSrc == 3'b001 && EX_ALUOut[0]) ? 3'b001 : (ID_PCSrc == 3'b001 ? 3'b000 : ID_PCSrc);
+	
+	assign EX_ForwardJrData = (EX_ForwardJr == 2'b00) ? ID_RegReadData1 :
+								(EX_ForwardJr == 2'b01) ? EX_ALUOut :
+								(EX_ForwardJr == 2'b10) ? iMemReadData :
+								WB_RegWriteData;
 	
 	assign IF_PC_plus_4 = IF_PC + 32'd4;
-	assign IF_PC_next_raw =
-						(EX_PCSrc == 3'b000) ? IF_PC_plus_4:
-						(EX_PCSrc == 3'b001) ? EX_BranchTarget:
-						(EX_PCSrc == 3'b010) ? ID_JumpTarget:
-						(EX_PCSrc == 3'b011) ? ID_RegReadData1:
-						(EX_PCSrc == 3'b100) ? 32'h80000004:
+	assign IF_PC_next =
+						(PCSrc == 3'b000) ? IF_PC_plus_4:
+						(PCSrc == 3'b001) ? EX_BranchTarget:
+						(PCSrc == 3'b010) ? ID_JumpTarget:
+						(PCSrc == 3'b011) ? EX_ForwardJrData:
+						(PCSrc == 3'b100) ? 32'h80000004:
 						32'h80000008;
-	/*assign IF_PC_next = (BeginInterrupt|ID_IsJrJal) ? IF_PC_next_raw :
-                    {IF_PC[31],IF_PC_next_raw[30:0]};*/
-	assign IF_PC_next = IF_PC_plus_4;
+
 	PC_reg PC_reg0(.clk(clk), .reset(reset), .PCWrite(PCWrite), .iPC(IF_PC_next), .oPC(IF_PC));
 	
 	ROM rom0(.addr(IF_PC),.data(IF_Instruction));
@@ -174,7 +181,7 @@ module pipeline_core(clk,
 			);
 	
 	
-	//====== ID Stage ======
+	//====== ID Stage & WB Stage ======
 	HazardUnit HazardUnit0(.ID_EX_MemRead(EX_MemRead),
 							.ID_EX_InstRt(EX_InstRt),
 							.IF_ID_InstRs(ID_InstRs),
@@ -219,7 +226,7 @@ module pipeline_core(clk,
 
 	assign ID_Ext_out = {ID_ExtOp? {16{ID_InstImmediate[15]}}: 16'h0000, ID_InstImmediate[15:0]};
 	assign ID_LU_out = ID_LuOp? {ID_InstImmediate[15:0], 16'h0000}: ID_Ext_out;
-	assign ID_JumpTarget = {ID_PC_plus_4[31:28], ID_InstJumpAddr, 2'b00};
+	assign ID_JumpTarget = {IF_PC_plus_4[31:28], ID_InstJumpAddr, 2'b00};
 	
 	
 	ID_EX_reg ID_EX_reg0(.clk(clk),
@@ -297,14 +304,16 @@ module pipeline_core(clk,
 							.oMemToReg(MEM_MemToReg),
 							.oRegWrite(MEM_RegWrite),
 							.oALUOut(MEM_ALUOut));
-							
+	
+	assign EX_RegWriteAddr = (EX_RegDst == 2'b00)? EX_InstRt: (EX_RegDst == 2'b01)? EX_InstRd: (EX_RegDst == 2'b10)? 5'b11111 : 5'd26;	
+	
 	ForwardUnit ForwardUnit0(.EX_MEM_RegWrite(MEM_RegWrite),
 							.EX_MEM_RegWriteAddr(MEM_RegWriteAddr),
 							.ID_EX_InstRt(EX_InstRt),
 							.ID_EX_InstRs(EX_InstRs),
 							.ID_PCSrc(ID_PCSrc),
-							.IF_ID_InstRd(ID_InstRd),
-							.ID_EX_InstRd(EX_InstRd),
+							.IF_ID_InstRs(ID_InstRs),
+							.ID_EX_RegWriteAddr(EX_RegWriteAddr),
 							.ID_EX_RegWrite(EX_RegWrite),
 							.MEM_WB_RegWrite(WB_RegWrite),
 							.MEM_WB_RegWriteAddr(WB_RegWriteAddr),

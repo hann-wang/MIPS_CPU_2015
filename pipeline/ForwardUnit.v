@@ -8,8 +8,8 @@ module ForwardUnit(
 	input	[4:0]	ID_EX_InstRt,
 	input	[4:0]	ID_EX_InstRs,
 	input	[2:0]	ID_PCSrc,
-	input	[4:0]	IF_ID_InstRd,
-	input	[4:0]	ID_EX_InstRd,
+	input	[4:0]	IF_ID_InstRs,
+	input	[4:0]	ID_EX_RegWriteAddr,
 	input			ID_EX_RegWrite,
 	input			MEM_WB_RegWrite,
 	input	[4:0]	MEM_WB_RegWriteAddr,
@@ -42,18 +42,18 @@ module ForwardUnit(
 			else
 					ForwardB = 2'b00;
 
-		if (ID_PCSrc == 3'b011 && IF_ID_InstRd == ID_EX_InstRd && ID_EX_InstRd != 0 && ID_EX_RegWrite)
+		if (ID_PCSrc == 3'b011 && IF_ID_InstRs == ID_EX_RegWriteAddr && ID_EX_RegWriteAddr != 0 && ID_EX_RegWrite)
 			ForwardJr = 2'b01;
 		else if (ID_PCSrc == 3'b011 && 
-				IF_ID_InstRd != ID_EX_InstRd && 
-				IF_ID_InstRd == EX_MEM_RegWriteAddr && 
+				IF_ID_InstRs != ID_EX_RegWriteAddr && 
+				IF_ID_InstRs == EX_MEM_RegWriteAddr && 
 				EX_MEM_RegWrite && 
 				EX_MEM_RegWriteAddr != 0)
 					ForwardJr = 2'b10;
 				else if (ID_PCSrc == 3'b011 && 
-						IF_ID_InstRd != ID_EX_InstRd &&
-						IF_ID_InstRd != EX_MEM_RegWriteAddr && 
-						IF_ID_InstRd == MEM_WB_RegWriteAddr && 
+						IF_ID_InstRs != ID_EX_RegWriteAddr &&
+						IF_ID_InstRs != EX_MEM_RegWriteAddr && 
+						IF_ID_InstRs == MEM_WB_RegWriteAddr && 
 						MEM_WB_RegWriteAddr != 0 &&
 						MEM_WB_RegWrite)
 							ForwardJr = 2'b11;
