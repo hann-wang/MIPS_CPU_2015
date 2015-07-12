@@ -9,13 +9,14 @@ module ID_EX_reg(
 	input	[5:0]	iInstOpCode,
 	input	[5:0]	iInstFunct,
 	input	[31:0]	iPC_plus_4,
+	input	[4:0]	iInstRs,
 	input	[4:0]	iInstRt,
 	input	[4:0]	iInstRd,
 	input	[4:0]	iInstShamt,
 	input 	[31:0]	iRegReadData1,
 	input	[31:0]	iRegReadData2,
 	input	[1:0]	iRegDst,
-	input	[1:0]	iPCSrc,
+	input	[2:0]	iPCSrc,
 	input			iMemRead,
 	input			iMemWrite,
 	input	[1:0]	iMemToReg,
@@ -28,13 +29,14 @@ module ID_EX_reg(
 	output	reg [5:0]	oInstOpCode,
 	output	reg [5:0]	oInstFunct,
 	output	reg [31:0]	oPC_plus_4,
+	output	reg [4:0]	oInstRs,
 	output	reg [4:0]	oInstRt,
 	output	reg [4:0]	oInstRd,
 	output	reg [4:0]	oInstShamt,
 	output	reg [31:0]	oRegReadData1,
 	output	reg [31:0]	oRegReadData2,
 	output	reg [1:0]	oRegDst,
-	output	reg [1:0]	oPCSrc,
+	output	reg [2:0]	oPCSrc,
 	output	reg 		oMemRead,
 	output	reg 		oMemWrite,
 	output	reg [1:0]	oMemToReg,
@@ -51,13 +53,14 @@ module ID_EX_reg(
 			oInstOpCode <= 6'h00;
 			oInstFunct <= 6'h00;
 			oPC_plus_4 <= 32'h00000000;
+			oInstRs <= 5'h00;
 			oInstRt <= 5'h00;
 			oInstRd <= 5'h00;
 			oInstShamt <= 5'h00;
 			oRegReadData1 <= 32'h00000000;
 			oRegReadData2 <= 32'h00000000;
 			oRegDst <= 2'h0;
-			oPCSrc <= 2'h0;
+			oPCSrc <= 3'h0;
 			oMemRead <= 1'b0;
 			oMemWrite <= 1'b0;
 			oMemToReg <= 2'h0;
@@ -75,13 +78,14 @@ module ID_EX_reg(
 				oInstOpCode <= 6'h00;
 				oInstFunct <= 6'h00;
 				oPC_plus_4 <= 32'h00000000;
+				oInstRs <= 5'h00;
 				oInstRt <= 5'h00;
 				oInstRd <= 5'h00;
 				oInstShamt <= 5'h00;
 				oRegReadData1 <= 32'h00000000;
 				oRegReadData2 <= 32'h00000000;
 				oRegDst <= 2'h0;
-				oPCSrc <= 2'h0;
+				oPCSrc <= 3'h0;
 				oMemRead <= 1'b0;
 				oMemWrite <= 1'b0;
 				oMemToReg <= 2'h0;
@@ -97,6 +101,7 @@ module ID_EX_reg(
 				oInstOpCode <= iInstOpCode;
 				oInstFunct <= iInstFunct;
 				oPC_plus_4 <= iPC_plus_4;
+				oInstRs <= iInstRs;
 				oInstRt <= iInstRt;
 				oInstRd <= iInstRd;
 				oInstShamt <= iInstShamt;

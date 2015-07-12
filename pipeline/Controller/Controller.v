@@ -21,7 +21,7 @@ module Controller ( OpCode,
 	input  [5:0] OpCode;
 	input  [5:0] Funct;
 	input 	IRQ;
-	output [1:0] PCSrc;
+	output [2:0] PCSrc;
 	output RegWrite;
 	output [1:0] RegDst;
 	output MemRead;
@@ -44,10 +44,10 @@ module Controller ( OpCode,
 							1'b0;
 													
 	assign PCSrc =
-		(OpCode == 6'h02 || OpCode == 6'h03) ? 2'b10 :
-		(OpCode == 6'h00 && (Funct == 6'h08 || Funct == 6'h09)) ? 2'b11 :
-		(OpCode >= 6'h01 && OpCode <= 6'h07) ? 2'b01 :
-		2'b00;
+		(OpCode == 6'h02 || OpCode == 6'h03) ? 3'b010 :
+		(OpCode == 6'h00 && (Funct == 6'h08 || Funct == 6'h09)) ? 3'b011 :
+		(OpCode >= 6'h01 && OpCode <= 6'h07) ? 3'b001 :
+		3'b000;
 		
 	assign RegWrite = (IRQ) ? 1'b1 :
 			(OpCode == 6'h2b || (OpCode >= 6'h04 && OpCode <= 6'h07) || OpCode == 6'h01 || OpCode == 6'h02 || (OpCode == 6'h00 && Funct == 6'h08)) ? 1'b0 : 1'b1;

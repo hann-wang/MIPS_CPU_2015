@@ -42,6 +42,7 @@ module pipeline_core(clk,
 	
 	wire	[31:0]	EX_PC_plus_4;
 	wire	[5:0]	EX_InstOpCode;
+	wire	[4:0]	EX_InstRs;
 	wire	[4:0]	EX_InstRt;
 	wire	[4:0]	EX_InstRd;
 	wire	[4:0]	EX_InstShamt;
@@ -62,6 +63,7 @@ module pipeline_core(clk,
 	wire	[31:0]	EX_RegReadData2;
 	
 	wire	[31:0]	MEM_RegReadData2;
+	wire	[4:0]	MEM_RegWriteAddr;
 	
 	wire	[4:0]	WB_RegWriteAddr;
 	wire	[31:0]	WB_RegWriteData;
@@ -80,7 +82,7 @@ module pipeline_core(clk,
 	wire	[31:0]	WB_ALUOut;
 	//===== Controller =====
 	wire	[1:0]	ID_RegDst;
-	wire	[1:0]	ID_PCSrc;
+	wire	[2:0]	ID_PCSrc;
 	wire			ID_MemRead;
 	wire			ID_MemWrite;
 	wire	[1:0]	ID_MemToReg;
@@ -92,7 +94,7 @@ module pipeline_core(clk,
 	wire			ID_RegWrite;
 	
 	wire	[1:0]	EX_RegDst;
-	wire	[1:0]	EX_PCSrc;
+	wire	[2:0]	EX_PCSrc;
 	wire			EX_MemRead;
 	wire			EX_MemWrite;
 	wire	[1:0]	EX_MemToReg;
@@ -125,6 +127,11 @@ module pipeline_core(clk,
 	
 	wire			BeginInterrupt;
 	wire			IsJrJal;
+	
+	//====Forward Signal====
+	wire [1:0] EX_ForwardA, EX_ForwardB, EX_ForwardJr;
+	wire [31:0] EX_ForwardAData, EX_ForwardBData;
+	
 	//========================
 	//========================
 	//========================
@@ -133,12 +140,13 @@ module pipeline_core(clk,
 	assign BeginInterrupt = (~IF_PC[31])&iInterrupt;
 	
 	assign IF_PC_plus_4 = IF_PC + 32'd4;
-	assign IF_PC_next_raw =(ID_UndefinedInst) ? 32'h80000008:
-						(BeginInterrupt) ? 32'h80000004:
-						(EX_PCSrc == 2'b00) ? IF_PC_plus_4:
-						(EX_PCSrc == 2'b01) ? EX_BranchTarget:
-						(EX_PCSrc == 2'b10) ? ID_JumpTarget:
-						ID_RegReadData1;
+	assign IF_PC_next_raw =
+						(EX_PCSrc == 3'b000) ? IF_PC_plus_4:
+						(EX_PCSrc == 3'b001) ? EX_BranchTarget:
+						(EX_PCSrc == 3'b010) ? ID_JumpTarget:
+						(EX_PCSrc == 3'b011) ? ID_RegReadData1:
+						(EX_PCSrc == 3'b100) ? 32'h80000004:
+						32'h80000008;
 	/*assign IF_PC_next = (BeginInterrupt|ID_IsJrJal) ? IF_PC_next_raw :
                     {IF_PC[31],IF_PC_next_raw[30:0]};*/
 	assign IF_PC_next = IF_PC_plus_4;
@@ -206,6 +214,7 @@ module pipeline_core(clk,
 			.iInstOpCode(ID_InstOpCode),
 			.iInstFunct(ID_InstFunct),
 			.iPC_plus_4(ID_PC_plus_4),
+			.iInstRs(ID_InstRs),
 			.iInstRt(ID_InstRt),
 			.iInstRd(ID_InstRd),
 			.iInstShamt(ID_InstShamt),
@@ -225,6 +234,7 @@ module pipeline_core(clk,
 			.oInstOpCode(EX_InstOpCode),
 			.oInstFunct(EX_InstFunct),
 			.oPC_plus_4(EX_PC_plus_4),
+			.oInstRs(EX_InstRs),
 			.oInstRt(EX_InstRt),
 			.oInstRd(EX_InstRd),
 			.oInstShamt(EX_InstShamt),
@@ -245,8 +255,8 @@ module pipeline_core(clk,
 	
 	//====== EX Stage ======
 	ALUController alucontroller0(.ALUOp(EX_ALUOp), .OpCode(EX_InstOpCode), .Funct(EX_InstFunct), .ALUFunc(EX_ALUFunc), .Sign(EX_ALUSign));
-	assign EX_ALUIn1 = EX_ALUSrc1? {17'h00000, EX_InstShamt}: EX_RegReadData1;
-	assign EX_ALUIn2 = EX_ALUSrc2? EX_LU_out: EX_RegReadData2;
+	assign EX_ALUIn1 = EX_ALUSrc1? {17'h00000, EX_InstShamt}: EX_ForwardAData;
+	assign EX_ALUIn2 = EX_ALUSrc2? EX_LU_out: EX_ForwardBData;
 	ALU alu0(EX_ALUIn1, EX_ALUIn2, EX_ALUFunc, EX_ALUSign, EX_ALUOut, EX_ALUZero);
 	
 	assign EX_BranchTarget = (EX_ALUOut[0])? EX_PC_plus_4 + {EX_Ext_out[29:0], 2'b00}: EX_PC_plus_4;
@@ -273,12 +283,31 @@ module pipeline_core(clk,
 							.oMemToReg(MEM_MemToReg),
 							.oRegWrite(MEM_RegWrite),
 							.oALUOut(MEM_ALUOut));
+							
+	ForwardUnit ForwardUnit0(.EX_MEM_RegWrite(MEM_RegWrite),
+							.EX_MEM_RegWriteAddr(MEM_RegWriteAddr),
+							.ID_EX_InstRt(EX_InstRt),
+							.ID_EX_InstRs(EX_InstRs),
+							.ID_PCSrc(ID_PCSrc),
+							.ID_EX_RegWrite(EX_RegWrite),
+							.MEM_WB_RegWrite(WB_RegWrite),
+							.MEM_WB_RegWriteAddr(WB_RegWriteAddr),
+							.ForwardA(EX_ForwardA),
+							.ForwardB(EX_ForwardB),
+							.ForwardJr(EX_ForwardJr));
+	assign EX_ForwardAData = (EX_ForwardA==2'b00) ? EX_RegReadData1 :
+							(EX_ForwardA==2'b01) ? WB_RegWriteData :
+							MEM_ALUOut;
+	assign EX_ForwardBData = (EX_ForwardB==2'b00) ? EX_RegReadData2 :
+							(EX_ForwardB==2'b01) ? WB_RegWriteData :
+							MEM_ALUOut;
+							
 	//====== MEM Stage ======
 	assign oMemAddr = MEM_ALUOut;
 	assign oMemWrite = MEM_MemWrite;
 	assign oMemRead = MEM_MemRead;
 	assign oMemWriteData = MEM_RegReadData2;
-	
+	assign MEM_RegWriteAddr = (MEM_RegDst == 2'b00)? MEM_InstRt: (MEM_RegDst == 2'b01)? MEM_InstRd: (MEM_RegDst == 2'b10)? 5'b11111 : 5'd26;
 	MEM_WB_reg MEM_WB_reg0(.clk(clk),
 							.reset(reset),
 							.iPC_plus_4(MEM_PC_plus_4),
