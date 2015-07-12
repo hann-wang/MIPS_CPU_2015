@@ -119,10 +119,20 @@ SEND_LOOP:
     andi $t0, $t0, 0x0004    # $t0[2] = UART_CON[2], $t0[31:3] = $t0[1:0] = 0
     beq  $t0, $zero, SEND_LOOP
 
+    # Enable TX_STATUS
+    addi $t0, $t0, 0x0001
+    lw   $t1, 0($s0)
+    or   $t0, $t0, $t1       # Set UART_CON[0] to 1, the rest remains the same
+    sw   $t0, 0($s0)
+
     # Save result to UART_TXD, and Trigger a new transmission
     sw   $s3, -8($s0)
     
-    # Continue reading from UART
+    # Restore TX_STATUS and Continue reading from UART
+    lw   $t1, 0($s0)
+    addi $t0, $zero, -2      # -2 = 16'b1111_1111_1111_1110
+    and  $t0, $t0, $t1       # Set UART_CON[0] to 0, the rest remains the same
+    sw   $t0, 0($s0)
     j    READ_LOOP_1
 
 ###########################################################
