@@ -23,9 +23,9 @@
 # UART_TX:              0x40000018 = -8($s0)
 ###########################################################
 
-    j MAIN
-    j INTERRUPT
-    j EXCEPTION
+    j   MAIN
+    j   INTERRUPT
+    j   EXCEPTION
 
 MAIN:     
     lui  $t0, 0x4000            # $t0 = 0x40000000
@@ -42,89 +42,88 @@ MAIN:
 
 READ_LOOP_1:
     # Read 1st Argument from UART
-    lw  $t0, 0($s0)
-    sll $t0, $t0, 30
-    srl $t0, $t0, 31    # $t0 = UART_CON[1]
-    beq $t0, $zero, READ_LOOP_1
+    lw   $t0, 0($s0)
+    andi $t0, $t0, 0x0004    # $t0[3] = UART_CON[3], $t0[31:4] = $t0[2:0] = 0
+    beq  $t0, $zero, READ_LOOP_1
     # If (UART_CON[1] == 1), Read data (1st Argument). 
-    lw  $s1, -4($s0)
+    lw   $s1, -4($s0)
 
 READ_LOOP_2:
     # Read 2nd Argument from UART
-    lw  $t0, 0($s0)
-    sll $t0, $t0, 30
-    srl $t0, $t0, 31    # $t0 = UART_CON[1]
-    beq $t0, $zero, READ_LOOP_2
+    lw   $t0, 0($s0)
+    andi $t0, $t0, 0x0004    # $t0[3] = UART_CON[3], $t0[31:4] = $t0[2:0] = 0
+    beq  $t0, $zero, READ_LOOP_2
     # If (UART_CON[1] == 1), Read data (2nd Argument). 
-    lw  $s2, -4($s0)
+    lw   $s2, -4($s0)
 
 ###########################################################
-# SPECs SUBJECT TO CHANGE
-###########################################################
-# Using 7-segment display, format ..._xxxxxxx_0mmmm
+# Using 7-segment display, format ..._mmmm_0_xxxxxxx
 # xxxxxxx is the corresponding 7-segments
 # mmmm is the index of value to display
 ###########################################################
 
 DECODEARGS: 
-    sll $a0, $s1, 24
-    srl $a0, $a0, 28            # $a0 = $s1[7:4]
-    jal DECODE
-    sll $s4, $v0, 5
-    addi $t0, $zero, 0x0007     # $t0 = ..._0000000_00111
-    or $s4, $s4, $t0            # $s4 = ..._xxxxxxx_00111
+    sll  $a0, $s1, 24
+    srl  $a0, $a0, 28            # $a0 = $s1[7:4]
+    jal  DECODE
+    add  $s4, $v0, $zero         # $s4 = ..._0000_0_xxxxxxx
+    addi $t0, $zero, 0x0007     
+    sll  $t0, $t0, 8             # $t0 = ..._0111_0_0000000
+    or   $s4, $s4, $t0           # $s4 = ..._0111_0_xxxxxxx
 
-    sll $a0, $s1, 28
-    srl $a0, $a0, 28            # $a0 = $s1[3:0]
-    jal DECODE
-    sll $s5, $v0, 5
-    addi $t0, $zero, 11         # $t0 = ..._0000000_01011
-    or $s5, $s5, $t0            # $s5 = ..._xxxxxxx_01011
+    sll  $a0, $s1, 28
+    srl  $a0, $a0, 28            # $a0 = $s1[3:0]
+    jal  DECODE
+    add  $s5, $v0, $zero         # $s5 = ..._0000_0_xxxxxxx
+    addi $t0, $zero, 0x000B     
+    sll  $t0, $t0, 8             # $t0 = ..._1011_0_0000000
+    or   $s5, $s5, $t0           # $s5 = ..._1011_0_xxxxxxx
 
-    sll $a0, $s2, 24
-    srl $a0, $a0, 28            # $a0 = $s2[7:4]
-    jal DECODE
-    sll $s6, $v0, 5
-    addi $t0, $zero, 13         # $t0 = ..._0000000_01101
-    or $s6, $s6, $t0            # $s6 = ..._xxxxxxx_01101
+    sll  $a0, $s2, 24
+    srl  $a0, $a0, 28            # $a0 = $s2[7:4]
+    jal  DECODE
+    add  $s6, $v0, $zero         # $s6 = ..._0000_0_xxxxxxx
+    addi $t0, $zero, 0x000D     
+    sll  $t0, $t0, 8             # $t0 = ..._1101_0_0000000
+    or   $s6, $s6, $t0           # $s6 = ..._1101_0_xxxxxxx
 
-    sll $a0, $s2, 28
-    srl $a0, $a0, 28            # $a0 = $s2[3:0]
-    jal DECODE
-    sll $s7, $v0, 5
-    addi $t0, $zero, 14         # $t0 = ..._0000000_01110
-    or $s7, $s7, $t0            # $s7 = ..._xxxxxxx_01110
+    sll  $a0, $s2, 28
+    srl  $a0, $a0, 28            # $a0 = $s2[3:0]
+    jal  DECODE
+    add  $s7, $v0, $zero         # $s7 = ..._0000_0_xxxxxxx
+    addi $t0, $zero, 0x000E     
+    sll  $t0, $t0, 8             # $t0 = ..._1110_0_0000000
+    or   $s7, $s7, $t0           # $s7 = ..._1110_0_xxxxxxx
 
-    # set $t7 to 0
-    addi $t7, $zero, 0
+###########################################################
+# Find GCD
+###########################################################
+
+    addi $t7, $zero, 0           # $t7 = 0, initialize the index to show
 
     # Find GCD (Greatest Common Divisor)
     addi $a0, $s1, 0
     addi $a1, $s2, 0
-    jal GCD
+    jal  GCD                     # $v0 = GCD($a0, $a1)
     addi $s3, $v0, 0
 
     # Display result with LED
-    sw  $s3, -20($s0)
+    sw   $s3, -20($s0)
 
-    # Save result to UART_TXD
-    sw  $s3, -8($s0)
+###########################################################
+# Send Data to UART
+###########################################################
 
 SEND_LOOP:
-    # this loop is to send the result through UART
-    lw  $t0, 0($s0)
-    sll $t0, $t0, 29
-    srl $t0, $t0, 31    # $t0: 0 bit is TX_STATUS
-    bne $t0, $zero, SEND
-    j SEND_LOOP 
+    lw   $t0, 0($s0)
+    andi $t0, $t0, 0x0004    # $t0[2] = UART_CON[2], $t0[31:3] = $t0[1:0] = 0
+    beq  $t0, $zero, SEND_LOOP
 
-SEND:
-    # now the UART_Sender is available
-    # set TX_EN to send the result in UART_TXD
-    addi $t0, $zero, 1
-    sw   $t0, 0($s0)
-    sw   $zero, 0($s0)
-    j READ_LOOP_1
+    # Save result to UART_TXD, and Trigger a new transmission
+    sw   $s3, -8($s0)
+    
+    # Continue reading from UART
+    j    READ_LOOP_1
 
 ###########################################################
 #              BELOW this line are functions
@@ -168,7 +167,7 @@ GCD_RETURN:
 DECODE:
     # 0 -> 000_0001 ($v0 = 0x00000001)
     bne $a0, $zero, DECODE_NOT_0
-    addi $v0, $zero, 1
+    addi $v0, $zero, 0x0001
     j DECODE_RETURN
 
 DECODE_NOT_0:
@@ -176,7 +175,7 @@ DECODE_NOT_0:
     bne $a0, $t0, DECODE_NOT_1
 
     # 1 -> 100_1111 ($v0 = 0x0000004E)
-    addi $v0, $zero, 79
+    addi $v0, $zero, 0x004E
     j DECODE_RETURN
 
 DECODE_NOT_1:
@@ -184,7 +183,7 @@ DECODE_NOT_1:
     bne $a0, $t0, DECODE_NOT_2
 
     # 2 -> 001_0010 ($v0 = 0x00000012)
-    addi $v0, $zero, 18
+    addi $v0, $zero, 0x0012
     j DECODE_RETURN
 
 DECODE_NOT_2:
@@ -192,7 +191,7 @@ DECODE_NOT_2:
     bne $a0, $t0, DECODE_NOT_3
 
     # 3 -> 000_0110 ($v0 = 0x00000006)
-    addi $v0, $zero, 6
+    addi $v0, $zero, 0x0006
     j DECODE_RETURN
 
 DECODE_NOT_3:
@@ -200,7 +199,7 @@ DECODE_NOT_3:
     bne $a0, $t0, DECODE_NOT_4
 
     # 4 -> 100_1100 ($v0 = 0x0000004C)
-    addi $v0, $zero, 76
+    addi $v0, $zero, 0x4C
     j DECODE_RETURN
 
 DECODE_NOT_4:
@@ -208,7 +207,7 @@ DECODE_NOT_4:
     bne $a0, $t0, DECODE_NOT_5
 
     # 5 -> 010_0100 ($v0 = 0x00000024)
-    addi $v0, $zero, 36
+    addi $v0, $zero, 0x0024
     j DECODE_RETURN
 
 DECODE_NOT_5:
@@ -216,7 +215,7 @@ DECODE_NOT_5:
     bne $a0, $t0, DECODE_NOT_6
 
     # 6 -> 010_0000 ($v0 = 0x00000020)
-    addi $v0, $zero, 32
+    addi $v0, $zero, 0x0020
     j DECODE_RETURN
 
 DECODE_NOT_6:
@@ -224,7 +223,7 @@ DECODE_NOT_6:
     bne $a0, $t0, DECODE_NOT_7
 
     # 7 -> 000_1111 ($v0 = 0x0000000E)
-    addi $v0, $zero, 15
+    addi $v0, $zero, 0x000E
     j DECODE_RETURN
 
 DECODE_NOT_7:
@@ -232,7 +231,7 @@ DECODE_NOT_7:
     bne $a0, $t0, DECODE_NOT_8
 
     # 8 -> 000_0000 ($v0 = 0x00000000)
-    addi $v0, $zero, 0
+    addi $v0, $zero, 0x0000
     j DECODE_RETURN
 
 DECODE_NOT_8:
@@ -240,7 +239,7 @@ DECODE_NOT_8:
     bne $a0, $t0, DECODE_NOT_9
 
     # 9 -> 000_0100 ($v0 = 0x00000004)
-    addi $v0, $zero, 4
+    addi $v0, $zero, 0x0004
     j DECODE_RETURN
 
 DECODE_NOT_9:
@@ -248,7 +247,7 @@ DECODE_NOT_9:
     bne $a0, $t0, DECODE_NOT_A
 
     # A -> 000_1000 ($v0 = 0x00000008)
-    addi $v0, $zero, 8
+    addi $v0, $zero, 0x0008
     j DECODE_RETURN
 
 DECODE_NOT_A:
@@ -256,7 +255,7 @@ DECODE_NOT_A:
     bne $a0, $t0, DECODE_NOT_B
 
     # B -> 110_0000 ($v0 = 0x00000060)
-    addi $v0, $zero, 96
+    addi $v0, $zero, 0x0060
     j DECODE_RETURN
 
 DECODE_NOT_B:
@@ -264,7 +263,7 @@ DECODE_NOT_B:
     bne $a0, $t0, DECODE_NOT_C
 
     # C -> 011_0001 ($v0 = 0x00000031)
-    addi $v0, $zero, 49
+    addi $v0, $zero, 0x0031
     j DECODE_RETURN
 
 DECODE_NOT_C:
@@ -272,7 +271,7 @@ DECODE_NOT_C:
     bne $a0, $t0, DECODE_NOT_D
 
     # D -> 100_0010 ($v0 = 0x00000042)
-    addi $v0, $zero, 66
+    addi $v0, $zero, 0x0042
     j DECODE_RETURN
 
 DECODE_NOT_D:
@@ -280,12 +279,12 @@ DECODE_NOT_D:
     bne $a0, $t0, DECODE_NOT_E
 
     # E -> 011_0000 ($v0 = 0x00000030)
-    addi $v0, $zero, 48
+    addi $v0, $zero, 0x0030
     j DECODE_RETURN
 
 DECODE_NOT_E:
     # F -> 011_1000 ($v0 = 0x00000038)
-    addi $v0, $zero, 56
+    addi $v0, $zero, 0x0038
     j DECODE_RETURN
 
 DECODE_RETURN:
@@ -323,6 +322,8 @@ INTERRUPT_NOT_2:
     j INTERRUPT_RETURN
 
 INTERRUPT_RETURN:
+    addi $t0, $t0, -4
+    sub $26, $26, $t0
     jr $26
 
 ###########################################################
