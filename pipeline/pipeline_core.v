@@ -131,7 +131,8 @@ module pipeline_core(clk,
 	//====Forward Signal====
 	wire [1:0] EX_ForwardA, EX_ForwardB, EX_ForwardJr;
 	wire [31:0] EX_ForwardAData, EX_ForwardBData;
-	
+	//====Hazard Signal====
+	wire PCWrite, IF_ID_write, IF_ID_flush, ID_EX_flush;
 	//========================
 	//========================
 	//========================
@@ -150,14 +151,14 @@ module pipeline_core(clk,
 	/*assign IF_PC_next = (BeginInterrupt|ID_IsJrJal) ? IF_PC_next_raw :
                     {IF_PC[31],IF_PC_next_raw[30:0]};*/
 	assign IF_PC_next = IF_PC_plus_4;
-	PC_reg PC_reg0(.clk(clk), .reset(reset), .PCWrite(1), .iPC(IF_PC_next), .oPC(IF_PC));
+	PC_reg PC_reg0(.clk(clk), .reset(reset), .PCWrite(PCWrite), .iPC(IF_PC_next), .oPC(IF_PC));
 	
 	ROM rom0(.addr(IF_PC),.data(IF_Instruction));
 	
 	IF_ID_reg IF_ID_reg0(.clk(clk),
 			.reset(reset),
-			.flush(0),
-			.IF_ID_write(1),
+			.flush(IF_ID_flush),
+			.IF_ID_write(IF_ID_write),
 			.iInstruction(IF_Instruction),
 			.iPC_plus_4(IF_PC_plus_4),
 			.oPC_plus_4(ID_PC_plus_4),
@@ -174,6 +175,19 @@ module pipeline_core(clk,
 	
 	
 	//====== ID Stage ======
+	HazardUnit HazardUnit0(.ID_EX_MemRead(EX_MemRead),
+							.ID_EX_InstRt(EX_InstRt),
+							.IF_ID_InstRs(ID_InstRs),
+							.IF_ID_InstRt(ID_InstRt),
+							.ID_PCSrc(ID_PCSrc),
+							.ID_EX_PCSrc(EX_PCSrc),
+							.EX_ALUOut0(EX_ALUOut[0]),
+							.PCWrite(PCWrite),
+							.IF_ID_write(IF_ID_write),
+							.IF_ID_flush(IF_ID_flush),
+							.ID_EX_flush(ID_EX_flush));
+	
+	
 	Controller controller0(
 		.OpCode(ID_InstOpCode),
 		.Funct(ID_InstFunct),
@@ -210,7 +224,7 @@ module pipeline_core(clk,
 	
 	ID_EX_reg ID_EX_reg0(.clk(clk),
 			.reset(reset),
-			.flush(0),
+			.flush(ID_EX_flush),
 			.iInstOpCode(ID_InstOpCode),
 			.iInstFunct(ID_InstFunct),
 			.iPC_plus_4(ID_PC_plus_4),
@@ -289,6 +303,8 @@ module pipeline_core(clk,
 							.ID_EX_InstRt(EX_InstRt),
 							.ID_EX_InstRs(EX_InstRs),
 							.ID_PCSrc(ID_PCSrc),
+							.IF_ID_InstRd(ID_InstRd),
+							.ID_EX_InstRd(EX_InstRd),
 							.ID_EX_RegWrite(EX_RegWrite),
 							.MEM_WB_RegWrite(WB_RegWrite),
 							.MEM_WB_RegWriteAddr(WB_RegWriteAddr),

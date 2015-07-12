@@ -18,7 +18,8 @@ module ForwardUnit(
 	output	reg [1:0]	ForwardJr
     );
 
-	always @(*) begin
+	always @(*)
+	begin
 		if (EX_MEM_RegWrite == 1'b1 && 
 			EX_MEM_RegWriteAddr != 5'h00 &&
 			EX_MEM_RegWriteAddr == ID_EX_InstRs)

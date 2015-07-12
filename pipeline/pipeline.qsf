@@ -65,6 +65,7 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME pipeline_tb -section_id p
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 us" -section_id pipeline_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE pipeline_tb.v -section_id pipeline_tb
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name VERILOG_FILE HazardUnit.v
 set_global_assignment -name VERILOG_FILE ForwardUnit.v
 set_global_assignment -name VERILOG_FILE ALU/ALU.v
 set_global_assignment -name VERILOG_FILE Controller/Controller.v

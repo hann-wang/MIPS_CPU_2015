@@ -13,7 +13,7 @@ module ROM (addr,data);
 	
 	initial
 	begin
-		$readmemh("F:/Git/MIPS_CPU_2015/pipeline/InstructionROM/test_pipeline.rom", ROM_DATA);
+		$readmemh("F:/Git/MIPS_CPU_2015/pipeline/InstructionROM/test_loaduse.rom", ROM_DATA);
 	end
 	
 	assign data = ROM_DATA[addr[ROM_SIZE_BIT + 1:2]];
