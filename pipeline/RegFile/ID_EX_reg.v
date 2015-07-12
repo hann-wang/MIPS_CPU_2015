@@ -52,7 +52,7 @@ module ID_EX_reg(
 		begin
 			oInstOpCode <= 6'h00;
 			oInstFunct <= 6'h00;
-			oPC_plus_4 <= 32'h00000000;
+			oPC_plus_4 <= 32'h80000000;
 			oInstRs <= 5'h00;
 			oInstRt <= 5'h00;
 			oInstRd <= 5'h00;
@@ -77,7 +77,8 @@ module ID_EX_reg(
 			begin
 				oInstOpCode <= 6'h00;
 				oInstFunct <= 6'h00;
-				oPC_plus_4 <= 32'h00000000;
+				//oPC_plus_4 <= 32'h80000000;
+				oPC_plus_4 <= iPC_plus_4 - 4;
 				oInstRs <= 5'h00;
 				oInstRt <= 5'h00;
 				oInstRd <= 5'h00;

@@ -52,19 +52,17 @@
 `define ALUFUNC_GEZ     6'b111001
 `define ALUFUNC_GTZ     6'b111111
 
-module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign,IsJrJal);
+module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign);
 	input [1:0] ALUOp;
 	input [5:0] OpCode;
 	input [5:0] Funct;
 	output reg [5:0] ALUFunc;
 	output reg Sign;
-	output reg IsJrJal;
 	
 	always @(*)
     begin
         ALUFunc = 6'b000000;
         Sign = 1'b0;
-		IsJrJal = 1'b0;
         case(ALUOp)
 			2'b10:
 				begin
@@ -113,10 +111,6 @@ module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign,IsJrJal);
 							begin
 								ALUFunc = `ALUFUNC_LT;	Sign = 1'b1;
 							end
-						`FUNCT_JR:
-							IsJrJal = 1'b1;
-						`FUNCT_JALR:
-							IsJrJal = 1'b1;
 					endcase
 				end
 			2'b11:

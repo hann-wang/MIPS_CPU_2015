@@ -8,7 +8,6 @@ output [31:0] data1,data2;
 input [31:0] data3;
 
 reg [31:0] RF_DATA[31:1];
-integer i;
 
 //$0 MUST be all zeros
 //Resolve the conflict of read/write
@@ -21,7 +20,37 @@ assign data2 = (addr2==5'b0)?32'b0:
 
 always@(negedge reset or posedge clk) begin
 	if(~reset) begin
-		for(i=1;i<32;i=i+1) RF_DATA[i]<=32'b0;
+		RF_DATA[1]<=32'b0;
+		RF_DATA[2]<=32'b0;
+		RF_DATA[3]<=32'b0;
+		RF_DATA[4]<=32'b0;
+		RF_DATA[5]<=32'b0;
+		RF_DATA[6]<=32'b0;
+		RF_DATA[7]<=32'b0;
+		RF_DATA[8]<=32'b0;
+		RF_DATA[9]<=32'b0;
+		RF_DATA[10]<=32'b0;
+		RF_DATA[11]<=32'b0;
+		RF_DATA[12]<=32'b0;
+		RF_DATA[13]<=32'b0;
+		RF_DATA[14]<=32'b0;
+		RF_DATA[15]<=32'b0;
+		RF_DATA[16]<=32'b0;
+		RF_DATA[17]<=32'b0;
+		RF_DATA[18]<=32'b0;
+		RF_DATA[19]<=32'b0;
+		RF_DATA[20]<=32'b0;
+		RF_DATA[21]<=32'b0;
+		RF_DATA[22]<=32'b0;
+		RF_DATA[23]<=32'b0;
+		RF_DATA[24]<=32'b0;
+		RF_DATA[25]<=32'b0;
+		RF_DATA[26]<=32'b0;
+		RF_DATA[27]<=32'b0;
+		RF_DATA[28]<=32'b0;
+		RF_DATA[29]<=32'b0;
+		RF_DATA[30]<=32'b0;
+		RF_DATA[31]<=32'b0;
 	end
 	else begin
 		if(wr && addr3) RF_DATA[addr3] <= data3;

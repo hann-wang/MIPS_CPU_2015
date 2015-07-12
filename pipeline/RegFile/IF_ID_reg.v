@@ -9,7 +9,6 @@ module IF_ID_reg(clk,
 			iInstruction,
 			iPC_plus_4,
 			oPC_plus_4,
-			oInstruction,
 			oInstOpCode,
 			oInstRs,
 			oInstRt,
@@ -26,7 +25,6 @@ module IF_ID_reg(clk,
 	input	[31:0]	iInstruction;
 	input	[31:0]	iPC_plus_4;
 	output	reg [31:0]	oPC_plus_4;
-	output	reg	[31:0]	oInstruction;
 	output	[5:0]	oInstOpCode;
 	output	[4:0]	oInstRs;
 	output	[4:0]	oInstRt;
@@ -35,6 +33,8 @@ module IF_ID_reg(clk,
 	output	[5:0]	oInstFunct;
 	output	[15:0]	oInstImmediate;
 	output	[25:0]	oInstJumpAddr;
+	
+	reg		[31:0]	oInstruction;
 	
 	always @(posedge clk or negedge reset) begin
 		if (~reset)
@@ -46,7 +46,8 @@ module IF_ID_reg(clk,
 		begin
 			if (flush)
 			begin
-				oPC_plus_4 <= 32'h80000000;
+				//oPC_plus_4 <= 32'h80000000;
+				oPC_plus_4 <= iPC_plus_4 - 4;
 				oInstruction <= 32'h00000000;
 			end
 			else

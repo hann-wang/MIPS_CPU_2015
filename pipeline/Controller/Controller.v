@@ -16,8 +16,7 @@ module Controller ( OpCode,
 					ALUSrc2,
 					ExtOp,
 					LuOp,
-					ALUOp,
-					UndefinedInst);
+					ALUOp);
 	input  [5:0] OpCode;
 	input  [5:0] Funct;
 	input 	IRQ;
@@ -32,7 +31,7 @@ module Controller ( OpCode,
 	output ExtOp;
 	output LuOp;
 	output [1:0] ALUOp;
-	output UndefinedInst;
+	wire UndefinedInst;
 	
 	assign UndefinedInst =  (OpCode[4]) ? 1'b1 :
 							(OpCode[5]) ? ((OpCode[3:0]==4'h3 || OpCode[3:0]==4'hb)?1'b0:1'b1) :

@@ -129,7 +129,6 @@ module pipeline_core(clk,
 	wire	[31:0]	ID_JumpTarget;
 	
 	wire			BeginInterrupt;
-	wire			IsJrJal;
 	
 	//====Forward Signal====
 	wire [1:0] EX_ForwardA, EX_ForwardB, EX_ForwardJr;
@@ -169,7 +168,6 @@ module pipeline_core(clk,
 			.iInstruction(IF_Instruction),
 			.iPC_plus_4(IF_PC_plus_4),
 			.oPC_plus_4(ID_PC_plus_4),
-			.oInstruction(ID_Instruction),
 			.oInstOpCode(ID_InstOpCode),
 			.oInstRs(ID_InstRs),
 			.oInstRt(ID_InstRt),
@@ -209,8 +207,7 @@ module pipeline_core(clk,
 		.ALUSrc2(ID_ALUSrc2),
 		.ExtOp(ID_ExtOp),
 		.LuOp(ID_LuOp),
-		.ALUOp(ID_ALUOp),
-		.UndefinedInst(ID_UndefinedInst));
+		.ALUOp(ID_ALUOp));
 
 	assign WB_RegWriteAddr = (WB_RegDst == 2'b00)? WB_InstRt: (WB_RegDst == 2'b01)? WB_InstRd: (WB_RegDst == 2'b10)? 5'b11111 : 5'd26;
 	assign WB_RegWriteData = (WB_MemToReg == 2'b00)? WB_ALUOut: (WB_MemToReg == 2'b01)? WB_MemReadData: WB_PC_plus_4;
