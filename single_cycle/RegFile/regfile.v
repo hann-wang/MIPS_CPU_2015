@@ -8,14 +8,15 @@ output [31:0] data1,data2;
 input [31:0] data3;
 
 reg [31:0] RF_DATA[31:1];
-integer i;
+//integer i;
 
 assign data1=(addr1==5'b0)?32'b0:RF_DATA[addr1];	//$0 MUST be all zeros
 assign data2=(addr2==5'b0)?32'b0:RF_DATA[addr2];
 
 always@(negedge reset or posedge clk) begin
 	if(~reset) begin
-		for(i=1;i<32;i=i+1) RF_DATA[i]<=32'b0;
+		//for(i=1;i<32;i=i+1) RF_DATA[i]<=32'b0;
+		$readmemh("F:/Git/MIPS_CPU_2015/single_cycle/RegFile/regfile.rom", RF_DATA);
 	end
 	else begin
 		if(wr && addr3) RF_DATA[addr3] <= data3;

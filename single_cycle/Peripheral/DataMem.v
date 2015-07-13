@@ -21,13 +21,14 @@ module DataMem (reset,clk,rd,wr,addr,wdata,rdata);
 	/*always@(posedge clk) begin
 		if(wr && (addr < RAM_SIZE)) RAMDATA[addr[31:2]]<=wdata;
 	end*/
-	integer i;
+	//integer i;
 	always @(negedge reset or posedge clk)
 	begin
 		if (~reset)
 		begin
-			for (i = 0; i < RAM_SIZE; i = i + 1)
-				RAMDATA[i] <= 32'h00000000;
+			/*for (i = 0; i < RAM_SIZE; i = i + 1)
+				RAMDATA[i] <= 32'h00000000;*/
+			$readmemh("F:/Git/MIPS_CPU_2015/single_cycle/Peripheral/DataMem.rom", RAMDATA);
 		end	
 		else
 			if (wr && addr[31:28]!=4'h4)
