@@ -83,6 +83,10 @@ READ_LOOP_2:
     beq  $s2, $zero, READ_LOOP_2
     # If ($s2==0), read again
     
+    # disable UART receiver
+    addu $t0, $zero, $zero
+    sw   $t0, 0($s0)
+    
 ###########################################################
 # Using 7-segment display, format ..._mmmm_0_xxxxxxx
 # xxxxxxx is the corresponding 7-segments
@@ -145,17 +149,15 @@ SEND_LOOP:
     bne  $t0, $zero, SEND_LOOP
 
     # Enable TX_STATUS
-    addi $t0, $zero, 0x0003
+    addi $t0, $zero, 0x0001
     sw   $t0, 0($s0)
 
     # Save result to UART_TXD, and Trigger a new transmission
     sw   $s3, -8($s0)
     
     # Restore TX_STATUS and Continue reading from UART
-    #lw   $t1, 0($s0)
-    #addi $t0, $zero, -2      # -2 = 16'b1111_1111_1111_1110
-    #and  $t0, $t0, $t1       # Set UART_CON[0] to 0, the rest remains the same
-    #sw   $t0, 0($s0)
+    addi $t0, $zero, 0x0002
+    sw   $t0, 0($s0)          # Set UART_CON[0] to 0 and UART_CON[1] to 1
     j    READ_LOOP_1
 
 ###########################################################
