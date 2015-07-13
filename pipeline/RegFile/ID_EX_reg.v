@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 //2013011076 Wang Han
 //ID_EX Register
+//If an instruction is flushed, it means that it has been cancelled and the next instruction should be exactly the same one.
+//Instead of setting PC_plus_4 to 0x80000000, I set it to PC_plus_4 - 4.
 
 module ID_EX_reg(
 	input			clk,

@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
-//Single Cycle Controller
+//Pipeline Cycle Controller
 //ORI is added!
-
+//Remove IsJrJal signal; UndefinedInst is not an output now; PCSrc is widened so interrupt and exception can be handled together with PCSrc.
 module Controller ( OpCode,
 					Funct,
 					IRQ,

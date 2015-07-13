@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
 //Pipeline top module
-//Incomplete!
+//Use 50MHz directly now.
 
 module pipeline(sysclk,reset,switch,digi1,digi2,digi3,digi4,led,txd,rxd);
 

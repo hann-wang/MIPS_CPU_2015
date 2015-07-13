@@ -1,6 +1,8 @@
 `timescale 1ns/1ps
 //2013011076 Wang Han
 //IF_ID Register
+//If an instruction is flushed, it means that it has been cancelled and the next instruction should be the same one (previous one not flushed) or the previous (previous one flushed) .
+//Instead of setting PC_plus_4 to 0x80000000, I set it to PC_plus_4 - 8 or PC_plus_4 - 4 depending on whether the previous instruction has been flushed.
 
 module IF_ID_reg(clk,
 			reset,

@@ -1,9 +1,12 @@
-// 分频
-// 波特率9600，取16倍采样频率
+`timescale 1ns/1ps
+//2013011076 Wang Han
+// UART Clock Generator
+// Baud rate 9600, 16 times 1600 sampling
 // 50000000/(16*9600) = 325.52
+
 module uart_clk_gen(sysclk, uart_clk);
-	input sysclk; //系统时钟
-	output uart_clk; //采样时钟
+	input sysclk;
+	output uart_clk;
 	reg uart_clk;
 	reg [15:0] cnt;
 	initial begin
