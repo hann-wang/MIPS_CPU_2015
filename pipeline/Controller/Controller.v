@@ -37,7 +37,7 @@ module Controller ( OpCode,
 							(OpCode[5]) ? ((OpCode[3:0]==4'h3 || OpCode[3:0]==4'hb)?1'b0:1'b1) :
 							(OpCode[3:0]==4'he) ? 1'b1 :
 							(OpCode[3:0]==4'h0) ? ( (Funct[4]) ? 1'b1 :
-													(Funct[5]) ? ((Funct[3:0]<4'h8)?1'b0:1'b1) :
+													(Funct[5]) ? ((Funct[3:0]<4'h8 || Funct[3:0]==4'ha)?1'b0:1'b1) :
 													(Funct[3:0]==4'h0 || Funct[3:0]==4'h2 || Funct[3:0]==4'h3 || Funct[3:0]==4'h8 || Funct[3:0]==4'h9 || Funct[3:0]==4'ha) ? 1'b0 : 1'b1
 													) :
 							1'b0;
