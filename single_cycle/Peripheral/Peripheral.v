@@ -49,8 +49,8 @@ module Peripheral (reset,sysclk,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqou
 	
 	//UART module uses a 16-times baud rate clock
 	uart_clk_gen uart_clk_gen0(sysclk,uart_clk);
-	uarttx tx0(.uart_clk(uart_clk), .tx_data(tx_data), .tx_en(tx_en), .tx_status(tx_status), .txd(txd));
-	uartrx rx0(.uart_clk(uart_clk), .rxd(rxd), .rx_data(rx_data), .rx_status(rx_status));
+	uarttx tx0(.reset(reset), .uart_clk(uart_clk), .tx_data(tx_data), .tx_en(tx_en), .tx_status(tx_status), .txd(txd));
+	uartrx rx0(.reset(reset), .uart_clk(uart_clk), .rxd(rxd), .rx_data(rx_data), .rx_status(rx_status));
 	
 	assign rdata =  (rd) ? (
 					(addr==32'h40000000) ? TH :
