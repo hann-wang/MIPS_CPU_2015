@@ -43,8 +43,8 @@ START_HERE:
     #####Timer Start#####
     sw   $zero, -24($s0)       #TCON=0
     addu $t0, $zero, $zero
-    lui  $t0, 0xffff
-    ori  $t0, $t0, 0x3caf
+    lui  $t0, 0xfffe
+    ori  $t0, $t0, 0x795f
     sw   $t0, -32($s0)         #TH=0xffff3caf
     nor  $t0,$zero,$zero
     sw   $t0, -28($s0)         #TL=0xffffffff
