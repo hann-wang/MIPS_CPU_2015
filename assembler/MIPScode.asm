@@ -27,7 +27,11 @@
     j   INTERRUPT
     j   EXCEPTION
 
-MAIN:     
+MAIN: 
+    la $t0, START_HERE
+    jr $t0                      # clear PC[31]
+START_HERE:
+    addu $t0, $zero, $zero
     lui  $t0, 0x4000            # $t0 = 0x40000000
     addi $s0, $t0, 0x0020       # $s0 = 0x40000020
 
@@ -333,8 +337,7 @@ INTERRUPT_NOT_2:
     j INTERRUPT_RETURN
 
 INTERRUPT_RETURN:
-    addi $t0, $t0, -4
-    sub $26, $26, $t0
+    addi $26, $26, -4
     jr $26
 
 ###########################################################
