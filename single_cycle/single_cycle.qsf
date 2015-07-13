@@ -112,10 +112,13 @@ set_location_assignment PIN_N25 -to switch[0]
 set_location_assignment PIN_N2 -to sysclk
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
-set_global_assignment -name SMART_RECOMPILE ON
-set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT NORMAL
+set_global_assignment -name SMART_RECOMPILE OFF
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
 set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 set_global_assignment -name EDA_TEST_BENCH_FILE single_cycle_tb.v -section_id single_cycle_tb
+set_location_assignment PIN_C25 -to rxd
+set_location_assignment PIN_B25 -to txd
+set_global_assignment -name SDC_FILE single_cycle.sdc
 set_global_assignment -name VERILOG_FILE Peripheral/uart_tx.v
 set_global_assignment -name VERILOG_FILE Peripheral/uart_rx.v
 set_global_assignment -name VERILOG_FILE Peripheral/uart_clk_gen.v
@@ -131,6 +134,6 @@ set_global_assignment -name VERILOG_FILE clk_gen.v
 set_global_assignment -name VERILOG_FILE single_cycle_core.v
 set_global_assignment -name VERILOG_FILE single_cycle.v
 set_global_assignment -name CDF_FILE output_files/single_cycle.cdf
-set_location_assignment PIN_C25 -to rxd
-set_location_assignment PIN_B25 -to txd
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
