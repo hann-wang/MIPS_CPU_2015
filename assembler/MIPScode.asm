@@ -38,6 +38,8 @@ START_HERE:
     lui  $t0, 0x4000            # $t0 = 0x40000000
     addi $s0, $t0, 0x0020       # $s0 = 0x40000020
 
+    addi $t7, $zero, 0           # $t7 = 0, initialize the index to show
+    
     #####Timer Start#####
     sw   $zero, -24($s0)       #TCON=0
     addu $t0, $zero, $zero
@@ -45,9 +47,9 @@ START_HERE:
     ori  $t0, $t0, 0x3caf
     sw   $t0, -32($s0)         #TH=0xffff3caf
     nor  $t0,$zero,$zero
-    sw   $t0, -28($s7)         #TL=0xffffffff
+    sw   $t0, -28($s0)         #TL=0xffffffff
     addiu $t0, $zero, 3
-    sw   $t0, -24($s7)         #TCON=3
+    sw   $t0, -24($s0)         #TCON=3
     ######################
 
 ###########################################################
@@ -68,6 +70,8 @@ READ_LOOP_1:
     beq  $t0, $zero, READ_LOOP_1
     # If (UART_CON[1] == 1), Read data (1st Argument). 
     lw   $s1, -4($s0)
+    beq  $s1, $zero, READ_LOOP_1
+    # If ($s1==0), read again
 
 READ_LOOP_2:
     # Read 2nd Argument from UART
@@ -76,7 +80,9 @@ READ_LOOP_2:
     beq  $t0, $zero, READ_LOOP_2
     # If (UART_CON[1] == 1), Read data (2nd Argument). 
     lw   $s2, -4($s0)
-
+    beq  $s2, $zero, READ_LOOP_2
+    # If ($s2==0), read again
+    
 ###########################################################
 # Using 7-segment display, format ..._mmmm_0_xxxxxxx
 # xxxxxxx is the corresponding 7-segments
@@ -120,8 +126,6 @@ DECODEARGS:
 # Find GCD
 ###########################################################
 
-    addi $t7, $zero, 0           # $t7 = 0, initialize the index to show
-
     # Find GCD (Greatest Common Divisor)
     addi $a0, $s1, 0
     addi $a1, $s2, 0
@@ -141,19 +145,17 @@ SEND_LOOP:
     bne  $t0, $zero, SEND_LOOP
 
     # Enable TX_STATUS
-    addi $t0, $t0, 0x0001
-    lw   $t1, 0($s0)
-    or   $t0, $t0, $t1       # Set UART_CON[0] to 1, the rest remains the same
+    addi $t0, $zero, 0x0003
     sw   $t0, 0($s0)
 
     # Save result to UART_TXD, and Trigger a new transmission
     sw   $s3, -8($s0)
     
     # Restore TX_STATUS and Continue reading from UART
-    lw   $t1, 0($s0)
-    addi $t0, $zero, -2      # -2 = 16'b1111_1111_1111_1110
-    and  $t0, $t0, $t1       # Set UART_CON[0] to 0, the rest remains the same
-    sw   $t0, 0($s0)
+    #lw   $t1, 0($s0)
+    #addi $t0, $zero, -2      # -2 = 16'b1111_1111_1111_1110
+    #and  $t0, $t0, $t1       # Set UART_CON[0] to 0, the rest remains the same
+    #sw   $t0, 0($s0)
     j    READ_LOOP_1
 
 ###########################################################
@@ -339,15 +341,15 @@ INTERRUPT:
     j INTERRUPT_RETURN
 
 INTERRUPT_NOT_0:
-    addi $t0, $zero, 1
-    bne  $t7, $t0, INTERRUPT_NOT_1
+    addi $t5, $zero, 1
+    bne  $t7, $t5, INTERRUPT_NOT_1
     sw   $s5, -12($s0)
     addi $t7, $zero, 2
     j INTERRUPT_RETURN
 
 INTERRUPT_NOT_1:
-    addi $t0, $zero, 2
-    bne  $t7, $t0, INTERRUPT_NOT_2
+    addi $t5, $zero, 2
+    bne  $t7, $t5, INTERRUPT_NOT_2
     sw   $s6, -12($s0)
     addi $t7, $zero, 3
     j INTERRUPT_RETURN
