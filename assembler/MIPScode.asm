@@ -48,7 +48,7 @@ START_HERE:
 READ_LOOP_1:
     # Read 1st Argument from UART
     lw   $t0, 0($s0)
-    andi $t0, $t0, 0x0004    # $t0[3] = UART_CON[3], $t0[31:4] = $t0[2:0] = 0
+    andi $t0, $t0, 0x0008    # $t0[3] = UART_CON[3], $t0[31:4] = $t0[2:0] = 0
     beq  $t0, $zero, READ_LOOP_1
     # If (UART_CON[1] == 1), Read data (1st Argument). 
     lw   $s1, -4($s0)
@@ -56,7 +56,7 @@ READ_LOOP_1:
 READ_LOOP_2:
     # Read 2nd Argument from UART
     lw   $t0, 0($s0)
-    andi $t0, $t0, 0x0004    # $t0[3] = UART_CON[3], $t0[31:4] = $t0[2:0] = 0
+    andi $t0, $t0, 0x0008    # $t0[3] = UART_CON[3], $t0[31:4] = $t0[2:0] = 0
     beq  $t0, $zero, READ_LOOP_2
     # If (UART_CON[1] == 1), Read data (2nd Argument). 
     lw   $s2, -4($s0)

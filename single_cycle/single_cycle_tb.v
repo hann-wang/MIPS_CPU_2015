@@ -20,15 +20,16 @@ module single_cycle_tb;
 	single_cycle cpu0(clk,reset,switch,digi1,digi2,digi3,digi4,led,txd,rxd);
 	
 	initial begin
-		reset = 0;
-		clk = 0;
-		#20 reset = 1;
-		switch = 8'b01001010;
-		rdata = 8'h01;
-		rxd = 1'b1;
+		reset <= 0;
+		clk <= 0;
+		reset <= 0;
+		switch <= 8'b01001010;
+		rdata <= 8'h01;
+		rxd <= 1'b1;
 	end
 	
 	initial fork
+		#20 reset <= 1;
 		forever #10 clk = ~clk;
 		forever
 			begin
