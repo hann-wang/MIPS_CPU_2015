@@ -5,6 +5,7 @@
 module IF_ID_reg(clk,
 			reset,
 			flush,
+			pre_flush,
 			IF_ID_write,
 			iInstruction,
 			iPC_plus_4,
@@ -21,6 +22,7 @@ module IF_ID_reg(clk,
     input			clk;
     input			reset;
 	input 			flush;
+	input			pre_flush;
 	input 			IF_ID_write;
 	input	[31:0]	iInstruction;
 	input	[31:0]	iPC_plus_4;
@@ -47,7 +49,10 @@ module IF_ID_reg(clk,
 			if (flush)
 			begin
 				//oPC_plus_4 <= 32'h80000000;
-				oPC_plus_4 <= iPC_plus_4 - 4;
+				if (pre_flush)
+					oPC_plus_4 <= iPC_plus_4 - 8;
+				else
+					oPC_plus_4 <= iPC_plus_4 - 4;
 				oInstruction <= 32'h00000000;
 			end
 			else
