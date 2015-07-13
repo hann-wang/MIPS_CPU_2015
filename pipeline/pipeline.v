@@ -25,7 +25,7 @@ module pipeline(sysclk,reset,switch,digi1,digi2,digi3,digi4,led,txd,rxd);
 	wire	[11:0]	digi;
 	wire 			clk;
 	
-	clk_gen clk_gen0(sysclk,clk);
+	assign clk = sysclk;
 	
 	digitube_scan digitube_scan0(.digi_in(digi),.digi_out1(digi1),.digi_out2(digi2),.digi_out3(digi3),.digi_out4(digi4));
 

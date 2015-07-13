@@ -31,7 +31,6 @@ module pipeline_core(clk,
 	wire	[31:0]	IF_PC_next;
 	
 	wire	[31:0]	ID_PC_plus_4;
-	wire	[31:0]	ID_Instruction;
 	wire	[5:0]	ID_InstOpCode;
 	wire	[4:0]	ID_InstRs;
 	wire	[4:0]	ID_InstRt;

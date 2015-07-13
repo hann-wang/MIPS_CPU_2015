@@ -65,27 +65,6 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME pipeline_tb -section_id p
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 us" -section_id pipeline_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE pipeline_tb.v -section_id pipeline_tb
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
-set_global_assignment -name VERILOG_FILE HazardUnit.v
-set_global_assignment -name VERILOG_FILE ForwardUnit.v
-set_global_assignment -name VERILOG_FILE ALU/ALU.v
-set_global_assignment -name VERILOG_FILE Controller/Controller.v
-set_global_assignment -name VERILOG_FILE Controller/ALUController.v
-set_global_assignment -name VERILOG_FILE InstructionROM/rom.v
-set_global_assignment -name VERILOG_FILE Peripheral/uart_tx.v
-set_global_assignment -name VERILOG_FILE Peripheral/uart_rx.v
-set_global_assignment -name VERILOG_FILE Peripheral/uart_clk_gen.v
-set_global_assignment -name VERILOG_FILE Peripheral/Peripheral.v
-set_global_assignment -name VERILOG_FILE Peripheral/digitube_scan.v
-set_global_assignment -name VERILOG_FILE Peripheral/DataMem.v
-set_global_assignment -name VERILOG_FILE RegFile/regfile.v
-set_global_assignment -name VERILOG_FILE RegFile/PC_reg.v
-set_global_assignment -name VERILOG_FILE RegFile/MEM_WB_reg.v
-set_global_assignment -name VERILOG_FILE RegFile/IF_ID_reg.v
-set_global_assignment -name VERILOG_FILE RegFile/ID_EX_reg.v
-set_global_assignment -name VERILOG_FILE RegFile/EX_MEM_reg.v
-set_global_assignment -name VERILOG_FILE pipeline_core.v
-set_global_assignment -name VERILOG_FILE pipeline.v
-set_global_assignment -name VERILOG_FILE clk_gen.v
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
 set_location_assignment PIN_V13 -to digi1[6]
 set_location_assignment PIN_V14 -to digi1[5]
@@ -135,4 +114,28 @@ set_location_assignment PIN_N26 -to switch[1]
 set_location_assignment PIN_N25 -to switch[0]
 set_location_assignment PIN_N2 -to sysclk
 set_location_assignment PIN_B25 -to txd
+set_global_assignment -name SDC_FILE pipeline.sdc
+set_global_assignment -name VERILOG_FILE HazardUnit.v
+set_global_assignment -name VERILOG_FILE ForwardUnit.v
+set_global_assignment -name VERILOG_FILE ALU/ALU.v
+set_global_assignment -name VERILOG_FILE Controller/Controller.v
+set_global_assignment -name VERILOG_FILE Controller/ALUController.v
+set_global_assignment -name VERILOG_FILE InstructionROM/rom.v
+set_global_assignment -name VERILOG_FILE Peripheral/uart_tx.v
+set_global_assignment -name VERILOG_FILE Peripheral/uart_rx.v
+set_global_assignment -name VERILOG_FILE Peripheral/uart_clk_gen.v
+set_global_assignment -name VERILOG_FILE Peripheral/Peripheral.v
+set_global_assignment -name VERILOG_FILE Peripheral/digitube_scan.v
+set_global_assignment -name VERILOG_FILE Peripheral/DataMem.v
+set_global_assignment -name VERILOG_FILE RegFile/regfile.v
+set_global_assignment -name VERILOG_FILE RegFile/PC_reg.v
+set_global_assignment -name VERILOG_FILE RegFile/MEM_WB_reg.v
+set_global_assignment -name VERILOG_FILE RegFile/IF_ID_reg.v
+set_global_assignment -name VERILOG_FILE RegFile/ID_EX_reg.v
+set_global_assignment -name VERILOG_FILE RegFile/EX_MEM_reg.v
+set_global_assignment -name VERILOG_FILE pipeline_core.v
+set_global_assignment -name VERILOG_FILE pipeline.v
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
