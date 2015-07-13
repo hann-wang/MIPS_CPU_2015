@@ -39,7 +39,8 @@ MAIN:
 #     Waiting till UART_CON[1] == 1
 # }
 ###########################################################
-
+    addiu $t0, $zero, 0x0002
+    sw    $t0, 0($s0)        # enable UART receiver
 READ_LOOP_1:
     # Read 1st Argument from UART
     lw   $t0, 0($s0)
@@ -67,33 +68,33 @@ DECODEARGS:
     srl  $a0, $a0, 28            # $a0 = $s1[7:4]
     jal  DECODE
     add  $s4, $v0, $zero         # $s4 = ..._0000_0_xxxxxxx
-    addi $t0, $zero, 0x0007     
-    sll  $t0, $t0, 8             # $t0 = ..._0111_0_0000000
-    or   $s4, $s4, $t0           # $s4 = ..._0111_0_xxxxxxx
+    addi $t0, $zero, 0x0008     
+    sll  $t0, $t0, 8             # $t0 = ..._1000_0_0000000
+    or   $s4, $s4, $t0           # $s4 = ..._1000_0_xxxxxxx
 
     sll  $a0, $s1, 28
     srl  $a0, $a0, 28            # $a0 = $s1[3:0]
     jal  DECODE
     add  $s5, $v0, $zero         # $s5 = ..._0000_0_xxxxxxx
-    addi $t0, $zero, 0x000B     
-    sll  $t0, $t0, 8             # $t0 = ..._1011_0_0000000
-    or   $s5, $s5, $t0           # $s5 = ..._1011_0_xxxxxxx
+    addi $t0, $zero, 0x0004     
+    sll  $t0, $t0, 8             # $t0 = ..._0100_0_0000000
+    or   $s5, $s5, $t0           # $s5 = ..._0100_0_xxxxxxx
 
     sll  $a0, $s2, 24
     srl  $a0, $a0, 28            # $a0 = $s2[7:4]
     jal  DECODE
     add  $s6, $v0, $zero         # $s6 = ..._0000_0_xxxxxxx
-    addi $t0, $zero, 0x000D     
-    sll  $t0, $t0, 8             # $t0 = ..._1101_0_0000000
-    or   $s6, $s6, $t0           # $s6 = ..._1101_0_xxxxxxx
+    addi $t0, $zero, 0x0002     
+    sll  $t0, $t0, 8             # $t0 = ..._0010_0_0000000
+    or   $s6, $s6, $t0           # $s6 = ..._0010_0_xxxxxxx
 
     sll  $a0, $s2, 28
     srl  $a0, $a0, 28            # $a0 = $s2[3:0]
     jal  DECODE
     add  $s7, $v0, $zero         # $s7 = ..._0000_0_xxxxxxx
-    addi $t0, $zero, 0x000E     
-    sll  $t0, $t0, 8             # $t0 = ..._1110_0_0000000
-    or   $s7, $s7, $t0           # $s7 = ..._1110_0_xxxxxxx
+    addi $t0, $zero, 0x0001     
+    sll  $t0, $t0, 8             # $t0 = ..._0001_0_0000000
+    or   $s7, $s7, $t0           # $s7 = ..._0001_0_xxxxxxx
 
 ###########################################################
 # Find GCD
@@ -116,8 +117,8 @@ DECODEARGS:
 
 SEND_LOOP:
     lw   $t0, 0($s0)
-    andi $t0, $t0, 0x0004    # $t0[2] = UART_CON[2], $t0[31:3] = $t0[1:0] = 0
-    beq  $t0, $zero, SEND_LOOP
+    andi $t0, $t0, 0x0010    # $t0[4] = UART_CON[4]
+    bne  $t0, $zero, SEND_LOOP
 
     # Enable TX_STATUS
     addi $t0, $t0, 0x0001
