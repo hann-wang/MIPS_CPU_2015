@@ -111,6 +111,7 @@ module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign);
 							begin
 								ALUFunc = `ALUFUNC_LT;	Sign = 1'b1;
 							end
+						default: ;
 					endcase
 				end
 			2'b11:
@@ -152,6 +153,7 @@ module ALUController(ALUOp,OpCode,Funct,ALUFunc,Sign);
 							begin
 								ALUFunc = `ALUFUNC_GEZ;  Sign = 1'b1;
 							end
+						default: ;
 					endcase
 				end
         endcase

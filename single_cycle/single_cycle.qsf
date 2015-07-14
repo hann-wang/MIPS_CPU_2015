@@ -113,7 +113,7 @@ set_location_assignment PIN_N2 -to sysclk
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name SMART_RECOMPILE OFF
-set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT NORMAL
+set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT EXTRA
 set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 set_global_assignment -name EDA_TEST_BENCH_FILE single_cycle_tb.v -section_id single_cycle_tb
 set_location_assignment PIN_C25 -to rxd
