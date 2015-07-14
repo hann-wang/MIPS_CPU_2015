@@ -31,7 +31,7 @@
     j   EXCEPTION
 
 MAIN: 
-    la $t0, START_HERE
+    ori $t0, $zero, 0x0014
     jr $t0                      # clear PC[31]
 START_HERE:
     addu $t0, $zero, $zero
