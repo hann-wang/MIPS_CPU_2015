@@ -13,7 +13,7 @@ module ROM (addr,data);
 	
 	initial
 	begin
-		$readmemh("F:/Git/MIPS_CPU_2015/single_cycle/InstructionROM/MIPScode.rom", ROM_DATA);
+		$readmemh("F:/Git/MIPS_CPU_2015/single_cycle/InstructionROM/MIPScode_singlecycle.rom", ROM_DATA);
 	end
 	
 	assign data = ROM_DATA[addr[ROM_SIZE_BIT + 1:2]];
