@@ -105,10 +105,10 @@ regNameMap = {
 
 def twoComlCodeGen(value, bits):
     """
-    compute the 2's compliment of int value val
+    compute 2's complement code of int value val
     """
     if value < 0:
-        value = ( 1<<bits ) + value
+        value = (1 << bits) + value
     formatstring = '{:0%ib}' % bits
     return formatstring.format(value)
 
@@ -118,9 +118,6 @@ def main():
         return
     input_file = open(sys.argv[1], 'r')
     output_file= open(sys.argv[2], 'w')
-    # match_hex32b = re.compile('[0-9a-fA-F]{8}')
-    # START_ADDR = 0
-    # now_addr = START_ADDR
 
     currLineNum = 0
     lookupLabel = {}
