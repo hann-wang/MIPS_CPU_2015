@@ -76,8 +76,6 @@ module pipeline_core(clk,
 	wire	[31:0]  EX_ALUOut;
 	wire			EX_ALUSign;
 	wire	[5:0]	EX_ALUFunc;
-	wire			EX_ALUZero;
-	wire			EX_ALUNegative;
 	
 	wire	[31:0]	MEM_ALUOut;
 	
@@ -275,7 +273,7 @@ module pipeline_core(clk,
 	ALUController alucontroller0(.ALUOp(EX_ALUOp), .OpCode(EX_InstOpCode), .Funct(EX_InstFunct), .ALUFunc(EX_ALUFunc), .Sign(EX_ALUSign));
 	assign EX_ALUIn1 = EX_ALUSrc1? {17'h00000, EX_InstShamt}: EX_ForwardAData;
 	assign EX_ALUIn2 = EX_ALUSrc2? EX_LU_out: EX_ForwardBData;
-	ALU alu0(EX_ALUIn1, EX_ALUIn2, EX_ALUFunc, EX_ALUSign, EX_ALUOut, EX_ALUZero);
+	ALU alu0(.A(EX_ALUIn1), .B(EX_ALUIn2), .Signed(EX_ALUSign), .ALUFunc(EX_ALUFunc), .ALUOut(EX_ALUOut));
 	
 	assign EX_BranchTarget = (EX_ALUOut[0])? EX_PC_plus_4 + {EX_Ext_out[29:0], 2'b00}: EX_PC_plus_4;
 	
