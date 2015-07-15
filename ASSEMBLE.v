@@ -96,27 +96,23 @@ module Fun_10 (
 endmodule
 
 module Fun_11 (
-	A,
-	B,
 	fun,
-	sig,
+	z,
+	v,
+	n,
 	S);
-	input [31:0] A,B;
 	input [2:0] fun;
-	input sig;
 	output [31:0] S;
-	wire s,z,v,n;
-	
-	Fun_00 f(A,B,1,sig,s,z,v,n);
+	input z,v,n;
 	
 	assign S[31:1]=31'b0;
 	assign S[0]=
 		(fun==3'b001)?z:
 		(fun==3'b000)?~z:
 		(fun==3'b010)?n:
-		(fun==3'b100)?~(A[31]&sig): //GEZ
-		(fun==3'b110)?(A==32'b0)|(A[31]&sig): //LEZ
-		(fun==3'b111)?~((A==32'b0)|(A[31]&sig)):1'b0; //GTZ
+		(fun==3'b100)?(~n)|z: //GEZ
+		(fun==3'b110)?n|z: //LEZ
+		(fun==3'b111)?~n:1'b0; //GTZ
 endmodule
 
 	
