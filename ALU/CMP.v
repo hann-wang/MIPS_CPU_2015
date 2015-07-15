@@ -18,16 +18,11 @@ module CMP (input			Zero,
     parameter ERROR_OUTPUT = 1'b1;
 
     assign S = (FLAG == FLAG_CMP_EQ) ? Zero :
-					((FLAG == FLAG_CMP_NEQ) ? ~Zero :
-						((FLAG == FLAG_CMP_LT) ? Negative :
-							((FLAG == FLAG_CMP_LEZ) ? (Negative | Zero) :
-								((FLAG == FLAG_CMP_GEZ) ? (~Negative) : 
-									((FLAG == FLAG_CMP_GTZ) ? (~Negative & ~Zero) :
-										ERROR_OUTPUT
-									)
-								)
-							)
-						)
-					);
+					(FLAG == FLAG_CMP_NEQ) ? ~Zero :
+						(FLAG == FLAG_CMP_LT) ? Negative :
+							(FLAG == FLAG_CMP_LEZ) ? (Negative | Zero) :
+								(FLAG == FLAG_CMP_GEZ) ? (~Negative) : 
+									(FLAG == FLAG_CMP_GTZ) ? (~Negative & ~Zero) :
+										ERROR_OUTPUT;
 
 endmodule
