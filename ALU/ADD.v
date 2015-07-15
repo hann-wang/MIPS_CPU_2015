@@ -5,8 +5,8 @@
 ////// Overflow happens when pos+pos=neg or neg+neg=pos in SIGNED situation, and
 ////// big(MSB = 1)+big or big+small=small or small+big=small in UNSIGNED situation.
 ////////////////////////
-////// In UNSIGNED situation, Negtive always equals 0 .
-////// In SIGNED situation, if neg+neg or pos+pos, Negtive equals the MSB of the inputs, 
+////// In UNSIGNED situation, Negtive always equals to 0 .
+////// In SIGNED situation, if neg+neg or pos+pos, Negtive equals to the MSB of the inputs, 
 ////// otherwise, check the MSB of the output.
 
 module ADD (input	[31:0]	A,
