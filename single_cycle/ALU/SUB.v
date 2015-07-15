@@ -6,7 +6,7 @@
 ////// In UNSIGNED situation, if small-big, definitely Overflow; if big-big or small-small, check the MSB of the output.
 ////////////////////////
 ////// In SIGNED situation, if pos-pos or neg-neg, Negative equals to the MSB of the output; otherwise it equals to the MSB of the first parameter.
-////// In UNSIGNED situation, if big-small, positive; if small-big, negtive; otherwise just check the MSB of the output.
+////// In UNSIGNED situation, if big-small, positive; if small-big, negative; otherwise just check the MSB of the output.
  
 module SUB (input	[31:0]	A,
 			input	[31:0]	B,
