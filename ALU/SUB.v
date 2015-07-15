@@ -16,17 +16,17 @@ module SUB (input	[31:0]	A,
 			output			Overflow,
 			output			Negative);
 
-    wire m_zero;
-    wire m_overflow;
-    wire m_negative;
+	wire m_zero;
+	wire m_overflow;
+	wire m_negative;
 
-    ADD m_add0(A, ~B + 1, Signed, S, m_zero, m_overflow, m_negative);
+	ADD m_add0(A, ~B + 1, Signed, S, m_zero, m_overflow, m_negative);
 
-    assign Zero = ((S == 0) & ~Overflow);
+	assign Zero = ((S == 0) & ~Overflow);
 
-    assign Overflow = (Signed) ? ((A[31] & ~B[31] & ~S[31]) | (~A[31] & B[31] & S[31])) :
+	assign Overflow = (Signed) ? ((A[31] & ~B[31] & ~S[31]) | (~A[31] & B[31] & S[31])) :
 								((~A[31] & B[31]) | ((A[31] == B[31]) & S[31]));
 
-    assign Negative = (A[31] ^ B[31]) ? (Signed ? A[31] : B[31]) : S[31];
+	assign Negative = (A[31] ^ B[31]) ? (Signed ? A[31] : B[31]) : S[31];
 
 endmodule

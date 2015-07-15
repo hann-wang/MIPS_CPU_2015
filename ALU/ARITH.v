@@ -10,21 +10,20 @@ module ARITH(
 			output	[31:0]	ArithOut,
 			output			Zero,
 			output			Overflow,
-			output			Negative
-);
+			output			Negative);
 
-    wire[31:0] S_ADD;
-    wire[31:0] S_SUB;
+	wire[31:0] S_ADD;
+	wire[31:0] S_SUB;
 
-    wire Zero_ADD, Overflow_ADD, Negative_ADD;
-    ADD add0(A, B, Signed, S_ADD, Zero_ADD, Overflow_ADD, Negative_ADD);
+	wire Zero_ADD, Overflow_ADD, Negative_ADD;
+	ADD add0(A, B, Signed, S_ADD, Zero_ADD, Overflow_ADD, Negative_ADD);
 
-    wire Zero_SUB, Overflow_SUB, Negative_SUB;
-    SUB sub0(A, B, Signed, S_SUB, Zero_SUB, Overflow_SUB, Negative_SUB);
+	wire Zero_SUB, Overflow_SUB, Negative_SUB;
+	SUB sub0(A, B, Signed, S_SUB, Zero_SUB, Overflow_SUB, Negative_SUB);
 
-    assign ArithOut = SubSign ? S_SUB : S_ADD;
-    assign Zero = SubSign ? Zero_SUB : Zero_ADD;
-    assign Overflow = SubSign ? Overflow_SUB : Overflow_ADD;
-    assign Negative = SubSign ? Negative_SUB : Negative_ADD;
-   
+	assign ArithOut = SubSign ? S_SUB : S_ADD;
+	assign Zero = SubSign ? Zero_SUB : Zero_ADD;
+	assign Overflow = SubSign ? Overflow_SUB : Overflow_ADD;
+	assign Negative = SubSign ? Negative_SUB : Negative_ADD;
+
 endmodule

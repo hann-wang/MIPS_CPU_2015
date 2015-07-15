@@ -17,14 +17,14 @@ module ADD (input	[31:0]	A,
 			output			Overflow,
 			output			Negative);
 
-    assign S = A + B;
+	assign S = A + B;
 
-    assign Zero = ((S == 0) & ~Overflow);
+	assign Zero = ((S == 0) & ~Overflow);
 
-    assign Overflow = (Signed) ?
+	assign Overflow = (Signed) ?
 								((A[31] & B[31] & ~S[31]) | (~A[31] & ~B[31] & S[31])) : 
 								((A[31] & B[31]) | (A[31] & ~S[31]) | (B[31] & ~S[31]));
 
-    assign Negative = Signed & ((A[31] ^ B[31]) ? S[31] : A[31]);
+	assign Negative = Signed & ((A[31] ^ B[31]) ? S[31] : A[31]);
 
 endmodule
