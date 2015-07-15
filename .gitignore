@@ -64,3 +64,8 @@ simulation/
 timing/
 testbench/
 *_sim/
+
+#TexLive Files
+*.log
+*.aux
+*.synctex
