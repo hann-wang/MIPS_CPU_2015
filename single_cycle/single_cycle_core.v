@@ -46,8 +46,6 @@ module single_cycle_core(clk,
 	wire	[31:0]  ALUOut;
 	wire			ALUSign;
 	wire	[5:0]	ALUFunc;
-	wire			ALUZero;
-	wire			ALUNegative;
 
 	//===== Controller =====
 	wire	[1:0]	RegDst;
@@ -145,9 +143,8 @@ module single_cycle_core(clk,
 	ALUController alucontroller0(.ALUOp(ALUOp), .OpCode(InstOpCode), .Funct(InstFunct), .ALUFunc(ALUFunc), .Sign(ALUSign), .IsJrJal(IsJrJal));
 	assign ALUIn1 = ALUSrc1? {17'h00000, InstShamt}: RegReadData1;
 	assign ALUIn2 = ALUSrc2? LU_out: RegReadData2;
-	ALU alu0(ALUIn1, ALUIn2, ALUFunc, ALUSign, ALUOut, ALUZero);
-	//ALU alu0(.iA(ALUIn1), .iB(ALUIn2), .iALUFun(ALUFunc), .iSign(ALUSign), .oS(ALUOut), .oZ(ALUZero), .oV(ALUOverflow), .oN(ALUNegative));
-	
+	ALU alu0(.A(ALUIn1), .B(ALUIn2), .Signed(ALUSign), .ALUFunc(ALUFunc), .ALUOut(ALUOut));
+			
 	//====== Direct Jump Target ======
 	assign JumpTarget = {PC_plus_4[31:28], InstJumpAddr, 2'b00};
 	
