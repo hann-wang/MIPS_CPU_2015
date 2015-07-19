@@ -69,3 +69,6 @@ testbench/
 *.log
 *.aux
 *.synctex
+
+#project files for submitting
+submit/
