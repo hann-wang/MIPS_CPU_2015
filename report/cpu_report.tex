@@ -136,13 +136,113 @@
             \end{enumerate}
             
         \subsection{流水线数据通路 \protect\footnote{作者：王晗}}
-
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=0.95\textwidth]{images/pipeline_datapath.png}
+                \caption{\label{fig:pipeline_datapath}流水线数据通路}
+            \end{figure}
+            \begin{enumerate}
+                \begin{item}
+                    在单周期数据通路的基础上添加流水线寄存器。
+                \end{item}
+                \begin{item}
+                    添加数据转发单元，从EX/MEM或MEM/WB寄存器转发数据，解决ALU运算中的数据关联问题。
+                \end{item}
+                \begin{item}
+                    完善数据转发单元，从ALUOut、MemReadData、RegWriteData转发数据，解决jr指令的数据关联问题。
+                \end{item}
+                \begin{item}
+                    添加冒险检测单元，对存在load-use竞争的指令阻塞一个周期，禁止PC寄存器写入、清空ID/EX寄存器。
+                \end{item}
+                \begin{item}
+                    完善冒险检测单元，在EX阶段进行分支时，需要清空IF/ID和ID/EX寄存器。
+                \end{item}
+                \begin{item}
+                    完善冒险检测单元，在ID阶段进行跳转时， 需要清空IF/ID寄存器。
+                \end{item}
+            \end{enumerate}
+            
         \subsection{汇编代码 \protect\footnote{作者：耿天毅}}
 
         \subsection{汇编器 \protect\footnote{作者：耿天毅}}
 
     \section{关键代码及文件清单}
-
+        \subsection{数据转发单元\protect\footnote{作者：王晗}}
+            
+            
+            \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={ForwardUnit.v}]
+        if (EX_MEM_RegWrite == 1'b1 &&
+        	EX_MEM_RegWriteAddr != 5'h00 &&
+        	EX_MEM_RegWriteAddr == ID_EX_InstRs)
+        		ForwardA = 2'b10;
+        else if (MEM_WB_RegWrite == 1'b1 &&
+        		MEM_WB_RegWriteAddr != 5'h00 &&
+        		MEM_WB_RegWriteAddr == ID_EX_InstRs)
+        			ForwardA = 2'b01;
+        	else
+        			ForwardA = 2'b00;
+            \end{Verbatim}
+            
+        \subsection{冒险检测单元\protect\footnote{作者：王晗}}
+        
+        \subsection{最大公约数汇编程序\protect\footnote{作者：耿天毅}}
+        
+        \subsection{数码管译码汇编程序\protect\footnote{作者：耿天毅}}
+        
+        \subsection{文件清单}
+            \begin{longtable}{l|ll}
+                \toprule
+                Directory & File & Description \\
+                \midrule
+                \endhead
+                \bottomrule
+                \endfoot
+                /assembler & /MIPSAssembler.py & Python编写的汇编器 \\
+                & /MIPScode\_singlecycle.asm & UART收发、求最大公约数、数码管译码 \\
+                & /MIPScode\_singlecycle.rom & 汇编结果 \\
+                & /MIPScode\_pipeline.asm & 在单周期基础上延长定时器周期 \\
+                & /MIPScode\_pipeline.rom & 汇编结果 \\
+                \midrule
+                /ALU & /ALU.v & ALU顶层模块 \\
+                & /ADD.v & 加法器 \\
+                & /SUB.v & 减法器 \\
+                & /ARITH.v & 算术运算单元 \\
+                & /CMP.v & 比较运算单元 \\
+                & /LOGIC.v & 逻辑运算单元 \\
+                & /SHIFT.v & 移位运算单元 \\
+                \midrule
+                /single\_cycle & /ALU/* & ALU, 同上 \\
+                & /Controller/Controller.v & 控制单元 \\
+                & /Controller/ALUController.v & ALU控制单元 \\
+                & /InstructionROM/rom.v & 指令存储器 \\
+                & /Peripheral/Peripheral.v & 外设顶层模块 \\
+                & /Peripheral/DataMem.v & 数据存储器 \\
+                & /Peripheral/digitube\_scan.v & 扫描方式工作的数码管 \\
+                & /Peripheral/uart* & UART相关模块 \\
+                & /RegFile/regfile.v & 寄存器堆 \\
+                & /clk\_gen.v & 分频模块 \\
+                & /single\_cycle\_core.v & 单周期CPU内核 \\
+                & /single\_cycle.v & 单周期CPU顶层模块 \\
+                & /single\_cycle\_tb.v & 单周期CPU TestBench \\
+                \midrule
+                /pipeline & /ALU/* & ALU, 同上 \\
+                & /Controller/Controller.v & 控制单元 \\
+                & /Controller/ALUController.v & ALU控制单元 \\
+                & /InstructionROM/rom.v & 指令存储器 \\
+                & /Peripheral/* & 外设，同上 \\
+                & /RegFile/regfile.v & 寄存器堆 \\
+                & /RegFile/PC\_reg.v & PC寄存器 \\
+                & /RegFile/IF\_ID\_reg.v & IF\_ID流水线寄存器 \\
+                & /RegFile/ID\_EX\_reg.v & ID\_EX流水线寄存器 \\
+                & /RegFile/EX\_MEM\_reg.v & EX\_MEM流水线寄存器 \\
+                & /RegFile/MEM\_WB\_reg.v & MEM\_WB流水线寄存器 \\
+                & /ForwardUnit.v & 数据转发单元 \\
+                & /HazardUnit.v & 冒险检测单元 \\
+                & /pipeline\_core.v & 流水线CPU内核 \\
+                & /pipeline.v & 流水线CPU顶层模块 \\
+                & /pipeline\_tb.v & 流水线CPU TestBench \\
+            \end{longtable}
+        
     \section{仿真结果及分析}
 
     \section{硬件调试情况}
