@@ -38,7 +38,7 @@
         \subsection{总体结构}
             由于这次实验涉及的功能较多，我们将完整的CPU分成多个模块。指令存储器、寄存器堆、控制器、ALU控制器、ALU、数据存储器、UART等功能单元均在单独的Module中实现。其中指令存储器、寄存器堆、控制器、ALU控制器、ALU等单元在Single Cycle Core中实例化，作为单周期处理器的核心；数据存储器、UART和定时器、LED、七段数码管、开关在Peripheral中实现，作为处理器的外设。处理器核心和外设在顶层模块中实例化，互相通信。
 
-            单周期CPU模块的结构关系如下图所示：
+            单周期CPU模块的结构关系如Figure~\ref{fig:singlecycle}所示：
             \begin{figure}[H]
                     \centering
                     \includegraphics[width=0.62\textwidth]{images/singlecycle.png}
@@ -57,7 +57,7 @@
             \begin{figure}[H]
                     \centering
                     \includegraphics[width=0.62\textwidth]{images/ALU.png}
-                    \caption{\label{fig:ALU}流水线处理器结构}
+                    \caption{\label{fig:ALU}ALU结构}
                 \end{figure}
 
             \paragraph*{ARITH模块}
@@ -292,10 +292,40 @@
 
     \section{仿真结果及分析}
         \subsection{单周期LED、Switch外设}
+            如Figure~\ref{fig:singlecycle_ledswitch}所示，从switch读入0x4a，再将0x4a输出至led。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/singlecycle_ledswitch.png}
+                \caption{\label{fig:singlecycle_ledswitch}单周期LED、Switch外设}
+            \end{figure}
             
         \subsection{单周期定时器、七段数码管}
-        
+            首先利用jr指令清空PC[31]，从而允许中断（如Figure~\ref{fig:singlecycle_digi1}所示）。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/singlecycle_digi1.png}
+                \caption{\label{fig:singlecycle_digi1}清空PC[31]}
+            \end{figure}
+            然后对定时器置数，启动定时器（如Figure~\ref{fig:singlecycle_digi2}所示）。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/singlecycle_digi2.png}
+                \caption{\label{fig:singlecycle_digi2}启动定时器}
+            \end{figure}
+            发生定时器中断时，先禁用定时器中断，改变一个数码管的值，再启用定时器中断（如Figure~\ref{fig:singlecycle_digi3}所示）。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/singlecycle_digi3.png}
+                \caption{\label{fig:singlecycle_digi3}定时器中断}
+            \end{figure}
+            
         \subsection{单周期串口}
+            如Figure~\ref{fig:singlecycle_uart}所示，从串口接收数据，加1，再通过串口返回。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/singlecycle_uart.png}
+                \caption{\label{fig:singlecycle_uart}单周期串口}
+            \end{figure}
         
         \subsection{单周期完整程序}
         
