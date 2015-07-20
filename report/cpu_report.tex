@@ -174,7 +174,7 @@
                         (addr1==addr3) ?  data3 :
                         RF_DATA[addr1];
             \end{Verbatim}
-            
+
         \subsection{数据转发单元\protect\footnote{作者：王晗}}
             对于ALU运算的指令，输入数据来自寄存器堆时，可能存在数据冒险。为了解决这个问题，可以从EX/MEM或MEM/WB寄存器转发数据到ALU 输入端。从EX/MEM转发的条件是前一条指令需要写非\$0寄存器，且写入地址和欲读取地址相等；从MEM/WB转发的条件是前两条指令需要写非\$0寄存器，欲读取的地址和写入地址相等，并且不能从前EX/MEM就近转发。
             \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={ForwardUnit.v}]
@@ -190,7 +190,7 @@
         			ForwardA = 2'b00;
         //ForwardB is similar to this.
             \end{Verbatim}
-            
+
             对于jr指令，同样存在数据冒险。由于跳转操作在ID阶段完成，如果检测到jr的目标寄存器和ID\_EX段写入寄存器相同，需要从ALUOut 转发数据；如果目标寄存器和EX\_MEM段写入寄存器相同，需要从MemReadData转发数据；如果目标寄存器和MEM\_WB段写入寄存器相同，则需要从RegWriteData转发数据。
             \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={ForwardUnit.v}]
         if (ID_PCSrc == 3'b011 && IF_ID_InstRs == ID_EX_RegWriteAddr
@@ -212,7 +212,7 @@
                     else
                         ForwardJr = 2'b00;
             \end{Verbatim}
-            
+
         \subsection{冒险检测单元\protect\footnote{作者：王晗}}
             对于load指令，需要阻塞一个周期，即在禁止PC寄存器、IF\_ID流水线寄存器写入，并清空ID\_EX流水线寄存器；\\
             对于跳转指令，在ID段完成正确的跳转，因此IF段的指令是错误的，需要清空IF\_ID流水线寄存器；\\
@@ -220,20 +220,20 @@
             \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={HazardUnit.v}]
     //参见/pipeline/HazardUnit.v
             \end{Verbatim}
-            
+
             在清空寄存器时，为了保证jal/jalr/中断/异常写入寄存器堆的PC+4保持正确，我们采用了如下策略：
             \begin{enumerate}
               \item 如果ID\_EX寄存器清空，表明一条指令被抛弃，需要将ID\_EX\_PC\_plus\_4的值减4；
               \item 如果IF\_ID寄存器清空且ID\_EX不清空，表明一条指令被抛弃，需要将IF\_ID\_PC\_plus\_4的值减4；
               \item 如果IF\_ID和ID\_EX寄存器同时清空，表明两条指令被抛弃，需要将IF\_ID\_PC\_plus\_4的值减8。
             \end{enumerate}
-            
+
         \subsection{UART输入\protect\footnote{作者：耿天毅}}
-        
+
         \subsection{最大公约数\protect\footnote{作者：耿天毅}}
 
         \subsection{数码管译码\protect\footnote{作者：耿天毅}}
-        
+
         \subsection{UART输出\protect\footnote{作者：耿天毅}}
 
         \subsection{文件清单}
@@ -298,7 +298,7 @@
                 \includegraphics[width=\textwidth]{images/singlecycle_ledswitch.png}
                 \caption{\label{fig:singlecycle_ledswitch}单周期LED、Switch外设}
             \end{figure}
-            
+
         \subsection{单周期定时器、七段数码管}
             首先利用jr指令清空PC[31]，从而允许中断（如Figure~\ref{fig:singlecycle_digi1}所示）。
             \begin{figure}[H]
@@ -318,7 +318,7 @@
                 \includegraphics[width=\textwidth]{images/singlecycle_digi3.png}
                 \caption{\label{fig:singlecycle_digi3}定时器中断}
             \end{figure}
-            
+
         \subsection{单周期串口}
             如Figure~\ref{fig:singlecycle_uart}所示，从串口接收数据，加1，再通过串口返回。
             \begin{figure}[H]
@@ -326,20 +326,54 @@
                 \includegraphics[width=\textwidth]{images/singlecycle_uart.png}
                 \caption{\label{fig:singlecycle_uart}单周期串口}
             \end{figure}
-        
+
         \subsection{单周期完整程序}
-        
+            我们现在MARS模拟器上进行了仿真（如Figure~\ref{fig:singlecycle_full1}所示），\$s1=125、\$s2=25为两个输入参数，\$s3=25为输出结果，最大公约数计算正确。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/singlecycle_full1.png}
+                \caption{\label{fig:singlecycle_full1}MARS仿真器仿真结果}
+            \end{figure}
+            如Figure~\ref{fig:singlecycle_full2}所示，从UART读入两个操作数，分别存放至\$s1、\$s2，最大公约数运算结果存放到\$s3，通过LED显示，同时经UART输出。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/singlecycle_full2.png}
+                \caption{\label{fig:singlecycle_full2}单周期完整程序运行结果}
+            \end{figure}
+            
         \subsection{流水线数据通路}
-        
+            如Figure~\ref{fig:pipeline_datapathtest}所示，将\$1置1，5个时钟周期后1被写入寄存器堆；
+            两个空指令(nop)后，将\$1加1并存入\$2，这时\$1的写入和读取发生在同一个时钟周期内。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/pipeline_datapathtest.png}
+                \caption{\label{fig:pipeline_datapathtest}流水线数据通路测试}
+            \end{figure}
+
         \subsection{流水线数据转发}
-        
+            连续执行如下三条指令：
+            \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={test\_dataforward.asm}]
+            addi $1,$0,1
+            add $2,$1,2
+            add $3,$1,3
+            \end{Verbatim}
+            这三条指令之间存在数据关联，需要Data-Forward Unit正常工作才能正确执行。
+            
+            仿真结果如Figure~\ref{fig:pipeline_dataforwardtest}所示：
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/pipeline_dataforwardtest.png}
+                \caption{\label{fig:pipeline_dataforwardtest}流水线数据转发测试}
+            \end{figure}
+            
         \subsection{流水线竞争冒险}
-        
+            
+            
         \subsection{流水线定时器、七段数码管}
-        
+
         \subsection{流水线完整程序}
-        
-        
+
+
     \section{硬件调试情况}
         \begin{enumerate}
           \item 在测试定时器和七段数码管时，汇编代码的最后一句是stop: j stop，然而中断服务程序返回后程序并未停留在此处。分析数据通路后发现，\$26寄存器存储的是PC+4地址，但是中断发生时PC语句并没有正确执行，因此中断服务程序返回前需要将\$26的值减4，否则程序将会跳过PC语句。
@@ -349,9 +383,9 @@
 
     \section{心得体会}
         很早就听说过大二暑假的MIPS处理器设计，尽管任务艰巨，但我们仍然十分期待。
-        
+
         3天单周期、3天流水线，我们用最快的速度和严谨的代码风格高质量地完成了处理器设计实验，并且在验收时得到了老师和助教的好评。这6 天的时间里，我们有过返工，例如陈志杰同学最初编写的ALU，代码风格欠佳，缺乏注释，大量使用x、y、z、t作为变量，给后续的联调造成了许多困难；这6天时间里，我们也有过讨论，Coding.Net讨论区、微信群、寝室都是我们讨论的场所，小组内外的讨论常常持续到凌晨……
-        
+
         实验结束了，看得见的是Coding.Net上一行行commit记录，看不见的是实验中对CPU的深入理解和收获。
 
 \end{document}
