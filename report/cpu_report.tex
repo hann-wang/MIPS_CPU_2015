@@ -107,7 +107,7 @@
                 \includegraphics[width=0.95\textwidth]{images/singlecycle_datapath.png}
                 \caption{\label{fig:singlecycle_datapath}单周期数据通路}
             \end{figure}
-            
+
             \begin{enumerate}
                 \begin{item}
                     当没有中断或异常时，根据PCSrc取出下一个PC地址，并读取指令；否则跳转至中断或异常服务程序。
@@ -134,7 +134,7 @@
                     PC的最高位为监督位，不用于寻址。当PC[31]=1时为内核态，禁止中断请求；当PC[31]=0时为正常态，允许中断请求。Reset、异常、中断可以将PC[31]置1，jr、jalr可以将PC[31]清零。
                 \end{item}
             \end{enumerate}
-            
+
         \subsection{流水线数据通路 \protect\footnote{作者：王晗}}
             \begin{figure}[H]
                 \centering
@@ -161,15 +161,22 @@
                     完善冒险检测单元，在ID阶段进行跳转时， 需要清空IF/ID寄存器。
                 \end{item}
             \end{enumerate}
-            
+
         \subsection{汇编代码 \protect\footnote{作者：耿天毅}}
 
         \subsection{汇编器 \protect\footnote{作者：耿天毅}}
 
     \section{关键代码及文件清单}
+        \subsection{寄存器堆的读写\protect\footnote{作者：王晗}}
+            寄存器堆在同一周期对同一个寄存器先写再读不会引起数据冒险，为了实现这个目的，先对读取的寄存器地址做判断，如果读取地址为0，则返回0；如果读取地址和写入地址相同，则返回写入的值；其他情况返回寄存器堆中相应寄存器的值。
+            \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={regfile.v}]
+        assign data1 =  (addr1==5'b0)  ?  32'b0 :
+                        (addr1==addr3) ?  data3 :
+                        RF_DATA[addr1];
+            \end{Verbatim}
+            
         \subsection{数据转发单元\protect\footnote{作者：王晗}}
-            
-            
+            对于ALU运算的指令，输入数据来自寄存器堆时，可能存在数据冒险。为了解决这个问题，可以从EX/MEM或MEM/WB寄存器转发数据到ALU 输入端。从EX/MEM转发的条件是前一条指令需要写非\$0寄存器，且写入地址和欲读取地址相等；从MEM/WB转发的条件是前两条指令需要写非\$0寄存器，欲读取的地址和写入地址相等，并且不能从前EX/MEM就近转发。
             \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={ForwardUnit.v}]
         if (EX_MEM_RegWrite == 1'b1 &&
         	EX_MEM_RegWriteAddr != 5'h00 &&
@@ -181,14 +188,55 @@
         			ForwardA = 2'b01;
         	else
         			ForwardA = 2'b00;
+        //ForwardB is similar to this.
+            \end{Verbatim}
+            
+            对于jr指令，同样存在数据冒险。由于跳转操作在ID阶段完成，如果检测到jr的目标寄存器和ID\_EX段写入寄存器相同，需要从ALUOut 转发数据；如果目标寄存器和EX\_MEM段写入寄存器相同，需要从MemReadData转发数据；如果目标寄存器和MEM\_WB段写入寄存器相同，则需要从RegWriteData转发数据。
+            \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={ForwardUnit.v}]
+        if (ID_PCSrc == 3'b011 && IF_ID_InstRs == ID_EX_RegWriteAddr
+            && ID_EX_RegWriteAddr != 0 && ID_EX_RegWrite)
+            ForwardJr = 2'b01;
+        else if (ID_PCSrc == 3'b011 &&
+                IF_ID_InstRs != ID_EX_RegWriteAddr &&
+                IF_ID_InstRs == EX_MEM_RegWriteAddr &&
+                EX_MEM_RegWrite &&
+                EX_MEM_RegWriteAddr != 0)
+                    ForwardJr = 2'b10;
+                else if (ID_PCSrc == 3'b011 &&
+                        IF_ID_InstRs != ID_EX_RegWriteAddr &&
+                        IF_ID_InstRs != EX_MEM_RegWriteAddr &&
+                        IF_ID_InstRs == MEM_WB_RegWriteAddr &&
+                        MEM_WB_RegWriteAddr != 0 &&
+                        MEM_WB_RegWrite)
+                            ForwardJr = 2'b11;
+                    else
+                        ForwardJr = 2'b00;
             \end{Verbatim}
             
         \subsection{冒险检测单元\protect\footnote{作者：王晗}}
+            对于load指令，需要阻塞一个周期，即在禁止PC寄存器、IF\_ID流水线寄存器写入，并清空ID\_EX流水线寄存器；\\
+            对于跳转指令，在ID段完成正确的跳转，因此IF段的指令是错误的，需要清空IF\_ID流水线寄存器；\\
+            对于分支指令，在EX段完成分支判断，因此如果成功跳转，IF、ID段的指令均是错误的，需要清空IF\_ID和ID\_EX流水线寄存器。
+            \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={HazardUnit.v}]
+    //参见/pipeline/HazardUnit.v
+            \end{Verbatim}
+            
+            在清空寄存器时，为了保证jal/jalr/中断/异常写入寄存器堆的PC+4保持正确，我们采用了如下策略：
+            \begin{enumerate}
+              \item 如果ID\_EX寄存器清空，表明一条指令被抛弃，需要将ID\_EX\_PC\_plus\_4的值减4；
+              \item 如果IF\_ID寄存器清空且ID\_EX不清空，表明一条指令被抛弃，需要将IF\_ID\_PC\_plus\_4的值减4；
+              \item 如果IF\_ID和ID\_EX寄存器同时清空，表明两条指令被抛弃，需要将IF\_ID\_PC\_plus\_4的值减8。
+            \end{enumerate}
+            
+            
+        \subsection{UART输入\protect\footnote{作者：耿天毅}}
         
-        \subsection{最大公约数汇编程序\protect\footnote{作者：耿天毅}}
+        \subsection{最大公约数\protect\footnote{作者：耿天毅}}
+
+        \subsection{数码管译码\protect\footnote{作者：耿天毅}}
         
-        \subsection{数码管译码汇编程序\protect\footnote{作者：耿天毅}}
-        
+        \subsection{UART输出\protect\footnote{作者：耿天毅}}
+
         \subsection{文件清单}
             \begin{longtable}{l|ll}
                 \toprule
@@ -242,7 +290,7 @@
                 & /pipeline.v & 流水线CPU顶层模块 \\
                 & /pipeline\_tb.v & 流水线CPU TestBench \\
             \end{longtable}
-        
+
     \section{仿真结果及分析}
 
     \section{硬件调试情况}
