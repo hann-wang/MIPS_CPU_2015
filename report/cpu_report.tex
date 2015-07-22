@@ -92,9 +92,9 @@
                 将机器码以十六进制文本的形式存放在.rom文件中，使用\$readmemh系统任务初始化一个大小为256words的只读存储器。
             \paragraph*{数据存储器}
                 由于数据存储器容量设计为256words，因此寻址时只根据address[9:2]寻址。 \\
-                另外，0x40000000开始的地址用于外设编址，因此数据存储器不对0x40000000开始的地址进行读写操作。
+                另外，\texttt{0x40000000}开始的地址用于外设编址，因此数据存储器不对\texttt{0x40000000}开始的地址进行读写操作。
             \paragraph*{其他外设}
-                定时器、LED、Switch参考老师提供的样例代码直接在Peripheral.v中实现，UART使用春季学期第四次实验的UART发送和接收模块，将发送模块中Tx\_Status的定义取反，即1表示发送端忙碌。UART的控制同样在Peripheral.v中实现，当0x40000018写入要发送的数据时，串口控制器自动产生一个发送使能信号。
+                定时器、LED、Switch参考老师提供的样例代码直接在Peripheral.v中实现，UART使用春季学期第四次实验的UART发送和接收模块，将发送模块中Tx\_Status的定义取反，即1表示发送端忙碌。UART的控制同样在Peripheral.v中实现，当\texttt{0x40000018}写入要发送的数据时，串口控制器自动产生一个发送使能信号。
 
         \subsection{控制器和ALU控制器 \protect\footnote{作者：王晗}}
             控制单元采用两级控制的实现方法，在主控制器中根据OpCode和Funct产生PCSrc、RegWrite、RegDst、MemRead、MemWrite、MemToReg、ALUSrc1、ALUSrc2、ExtOp、LuOp、ALUOp等控制信号，其中ALUOp 经过ALU控制器进一步解码生成ALUFunc、Signed信号，控制ALU的运算，其余信号控制数据通路中的多路选择器。控制器还产生了UndefinedInst信号，用于识别未定义指令的异常。
@@ -292,14 +292,14 @@
 
     \section{仿真结果及分析}
         \subsection{单周期LED、Switch外设}
-            如Figure~\ref{fig:singlecycle_ledswitch}所示，从switch读入0x4a，再将0x4a输出至led。
+            如Figure~\ref{fig:singlecycle_ledswitch}所示，从switch读入\texttt{0x4a}，再将\texttt{0x4a}输出至led。
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\textwidth]{images/singlecycle_ledswitch.png}
                 \caption{\label{fig:singlecycle_ledswitch}单周期LED、Switch外设}
             \end{figure}
 
-        \subsection{单周期定时器、七段数码管}
+        \subsection{\label{testdigi}单周期定时器、七段数码管}
             首先利用jr指令清空PC[31]，从而允许中断（如Figure~\ref{fig:singlecycle_digi1}所示）。
             \begin{figure}[H]
                 \centering
@@ -340,7 +340,7 @@
                 \includegraphics[width=\textwidth]{images/singlecycle_full2.png}
                 \caption{\label{fig:singlecycle_full2}单周期完整程序运行结果}
             \end{figure}
-            
+
         \subsection{流水线数据通路}
             如Figure~\ref{fig:pipeline_datapathtest}所示，将\$1置1，5个时钟周期后1被写入寄存器堆；
             两个空指令(nop)后，将\$1加1并存入\$2，这时\$1的写入和读取发生在同一个时钟周期内。
@@ -358,20 +358,84 @@
             add $3,$1,3
             \end{Verbatim}
             这三条指令之间存在数据关联，需要Data-Forward Unit正常工作才能正确执行。
-            
+
             仿真结果如Figure~\ref{fig:pipeline_dataforwardtest}所示：
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\textwidth]{images/pipeline_dataforwardtest.png}
                 \caption{\label{fig:pipeline_dataforwardtest}流水线数据转发测试}
             \end{figure}
-            
-        \subsection{流水线竞争冒险}
-            
-            
-        \subsection{流水线定时器、七段数码管}
 
+        \subsection{流水线竞争冒险}
+            执行下列指令：
+            \begin{Verbatim}[frame=lines,numbers=left,stepnumber=5,label={test\_loaduse.asm}]
+            addu $1, $0, $0
+            lui $1, 0x4000
+            lw $2, 16($1)
+            addi $2, $2, 1
+            sw $2, 12($1)
+            \end{Verbatim}
+            lui和lw指令之间存在数据关联，lw和addi指令之间存在load-use竞争，需要阻塞一个周期。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/pipeline_loadusetest.png}
+                \caption{\label{fig:pipeline_loadusetest}load-use冒险测试}
+            \end{figure}
+            如Figure~\ref{fig:pipeline_loadusetest}所示，流水线被成功阻塞，运算结果正确。
+
+        \subsection{流水线定时器、七段数码管}
+            在流水线CPU上运行Section~\ref{testdigi}中的汇编代码，测试流水线中的分支、跳转和中断。
+            
+            如Figure~\ref{fig:pipeline_digitest1}所示，Jump和Jump-to-Register均工作正常，其中jr指令采用dataforward提前完成了跳转。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/pipeline_digitest1.png}
+                \caption{\label{fig:pipeline_digitest1}流水线中的跳转}
+            \end{figure}
+            如Figure~\ref{fig:pipeline_digitest2}所示，中断发生时，程序跳转至中断服务程序入口\texttt{0x80000004}。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=0.8\textwidth]{images/pipeline_digitest2.png}
+                \caption{\label{fig:pipeline_digitest2}流水线中的中断}
+            \end{figure}
+            如Figure~\ref{fig:pipeline_digitest3}所示，\$24记录的是下一个需要点亮的数码管，程序根据\$24的值进行分支，点亮不同的数码管，实现译码输出。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/pipeline_digitest3.png}
+                \caption{\label{fig:pipeline_digitest3}流水线中的分支}
+            \end{figure}
+        
         \subsection{流水线完整程序}
+            由于流水线CPU的时钟频率明显高于单周期，因此我们在流水线中去除了分频模块，并且增大了定时器计数范围。
+            
+            如Figure~\ref{fig:pipeline_full}所示，从UART读入两个操作数，分别存放至\$s1、\$s2，最大公约数运算结果存放到\$s3。
+            \begin{figure}[H]
+                \centering
+                \includegraphics[width=\textwidth]{images/pipeline_full.png}
+                \caption{\label{fig:pipeline_full}流水线完整程序运行结果}
+            \end{figure}
+            
+    \section{综合情况}
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{c|lr}
+              \toprule
+              Version & Specification & Value \\
+              \midrule
+              Single Cycle  & Total combinational functions & 8,990 / 33,216 (27\%) \\
+                            & Dedicated logic registers & 9,435 / 33,216 (28\%) \\
+                            & Max frequency & 31.81 MHz \\
+                            & Setup time & 8.564 ns \\
+                            & Hold time & 0.391 ns \\
+              \midrule
+              Pipeline  & Total combinational functions & 9,699 / 33,216 (29\%) \\
+                        & Dedicated logic registers & 9,982 / 33,216 (30\%) \\
+                        & Max frequency & 63.36 MHz \\
+                        & Setup time & 4.218 ns \\
+                        & Hold time & 0.391 ns \\
+              \bottomrule
+            \end{tabular}
+        \end{table}
 
 
     \section{硬件调试情况}
