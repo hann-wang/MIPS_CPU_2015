@@ -385,7 +385,7 @@
 
         \subsection{流水线定时器、七段数码管}
             在流水线CPU上运行Section~\ref{testdigi}中的汇编代码，测试流水线中的分支、跳转和中断。
-            
+
             如Figure~\ref{fig:pipeline_digitest1}所示，Jump和Jump-to-Register均工作正常，其中jr指令采用dataforward提前完成了跳转。
             \begin{figure}[H]
                 \centering
@@ -404,17 +404,17 @@
                 \includegraphics[width=\textwidth]{images/pipeline_digitest3.png}
                 \caption{\label{fig:pipeline_digitest3}流水线中的分支}
             \end{figure}
-        
+
         \subsection{流水线完整程序}
             由于流水线CPU的时钟频率明显高于单周期，因此我们在流水线中去除了分频模块，并且增大了定时器计数范围。
-            
+
             如Figure~\ref{fig:pipeline_full}所示，从UART读入两个操作数，分别存放至\$s1、\$s2，最大公约数运算结果存放到\$s3。
             \begin{figure}[H]
                 \centering
                 \includegraphics[width=\textwidth]{images/pipeline_full.png}
                 \caption{\label{fig:pipeline_full}流水线完整程序运行结果}
             \end{figure}
-            
+
     \section{综合情况}
         \begin{table}[H]
             \centering
@@ -441,7 +441,7 @@
     \section{硬件调试情况}
         \begin{enumerate}
           \item 在测试定时器和七段数码管时，汇编代码的最后一句是stop: j stop，然而中断服务程序返回后程序并未停留在此处。分析数据通路后发现，\$26寄存器存储的是PC+4地址，但是中断发生时PC语句并没有正确执行，因此中断服务程序返回前需要将\$26的值减4，否则程序将会跳过PC语句。
-          \item 理论课讨论的MIPS子集中并未包含jr指令，做流水线设计时也为考虑到jr引起的数据冒险。硬件调试中我们发现，(a)中提出先将\$26 的值减4再跳转，这样的设计在流水线中无法正确实现，因此我们决定增加jr指令的数据转发单元。
+          \item 理论课讨论的MIPS子集中并未包含jr指令，做流水线设计时也没有考虑到jr引起的数据冒险。硬件调试中我们发现，(a)中提出先将\$26的值减4再跳转，这样的设计在流水线中无法正确实现，因此我们决定增加jr指令的数据转发单元。
           \item 执行完整的最大公约数程序时，我们发现如果不开启定时器，则UART工作正常；一旦开启定时器，UART就会在Rx Status无效时继续读数。仔细排查发现，问题的原因是定时器中断服务程序中使用的\$t0寄存器和主程序中的\$t0寄存器存在冲突。更换临时寄存器后，问题得到了解决。
         \end{enumerate}
 
